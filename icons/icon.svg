@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- HowMuch? : icône d'application (charte v2 : butter, bubble, ink) -->
+  <rect width="1024" height="1024" fill="#F7D154"/>
+  <!-- point d'interrogation du logo (Bricolage Grotesque), légèrement incliné -->
+  <path fill="#171717" transform="translate(392 522) rotate(8) scale(0.6 -0.6)" d="M100 226Q96 269 105.5 296.5Q115 324 132.0 342.5Q149 361 169.5 374.5Q190 388 209.0 401.0Q228 414 240.0 431.5Q252 449 252 475Q252 510 231.5 525.5Q211 541 176 541Q154 541 128.5 535.5Q103 530 77.5 520.5Q52 511 28 499L21 635Q50 649 79.5 657.5Q109 666 139.0 670.5Q169 675 196 675Q240 675 278.0 664.0Q316 653 345.5 630.5Q375 608 392.0 574.5Q409 541 409 495Q409 453 395.5 425.0Q382 397 361.0 377.0Q340 357 317.0 341.5Q294 326 273.0 310.5Q252 295 239.5 275.0Q227 255 228 226ZM171 -13Q119 -13 93.5 9.0Q68 31 68 77Q68 124 93.5 146.0Q119 168 171 168Q224 168 250.0 146.0Q276 124 276 77Q276 -13 171 -13Z"/>
+  <!-- personnage : la bulle rose du « o » du logo, qui surgit du bas -->
+  <path d="M212 1024V870A300 300 0 0 1 812 870V1024Z" fill="#FF9AD5"/>
+  <!-- yeux levés vers la question -->
+  <circle cx="430" cy="830" r="66" fill="#FFF8F0"/>
+  <circle cx="594" cy="830" r="66" fill="#FFF8F0"/>
+  <circle cx="449" cy="800" r="34" fill="#171717"/>
+  <circle cx="613" cy="800" r="34" fill="#171717"/>
+  <!-- étincelles de la charte -->
+  <path d="M742 236l14 34 34 14-34 14-14 34-14-34-34-14 34-14z" fill="#171717"/>
+  <circle cx="270" cy="330" r="22" fill="#F2553D"/>
+  <circle cx="776" cy="452" r="14" fill="#4D7CFE"/>
+</svg>

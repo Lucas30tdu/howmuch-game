@@ -27,3 +27,16 @@ Le mode en ligne utilise Firebase Realtime Database (`howmuch-aeb9e`) via son AP
 ```
 
 Seuls les salons sont lisibles et modifiables ; le reste de la base reste fermé.
+
+## Icône et installation
+
+L'icône reprend la charte : fond jaune *butter*, la bulle rose du logo qui lève les yeux vers un grand « ? ».
+
+- `icons/icon.svg` : source vectorielle (1024 × 1024)
+- `icons/icon-512.png`, `icons/icon-192.png` : Android et installation web (aussi utilisée en icône adaptative)
+- `icons/apple-touch-icon.png` : écran d'accueil iPhone et iPad
+- `icons/favicon-32.png` : onglet du navigateur
+- `icons/icon-1024.png` : grand format (boutiques, réseaux)
+- `manifest.webmanifest` : nom, couleurs et icônes de l'application installée
+
+Pour installer le jeu comme une appli : sur iPhone, bouton Partager puis « Sur l'écran d'accueil » ; sur Android, menu ⋮ puis « Installer l'application ».
