@@ -116,6 +116,14 @@ h1,h2,h3,p{margin:0}
 .view{animation:rise .35s backwards}
 .stg>*{animation:rise .45s backwards;animation-delay:calc(var(--i,0)*45ms)}
 .pop{animation:pop .35s both}.shake{animation:sh .45s}
+/* Transitions douces : changement de contenu d'une zone, fermeture des feuilles, retour de la barre de navigation */
+@keyframes swap{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes down{from{transform:none}to{transform:translateY(100%)}}
+@keyframes navIn{from{opacity:0;transform:translateX(-50%) translateY(28px)}to{opacity:1;transform:translateX(-50%)}}
+.swap{animation:swap .28s ease-out backwards}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+.sheet.swc>*{animation:rise .3s cubic-bezier(.2,.8,.2,1) backwards}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
 /* ===== ONGLETS ===== */
@@ -211,9 +219,10 @@ h1,h2,h3,p{margin:0}
 /* Navigation */
 #nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--safe-b) + 18px);width:min(432px,calc(100% - 48px));height:68px;padding:0 10px;border-radius:var(--pill);background:var(--action);color:var(--on-action);display:flex;align-items:center;justify-content:space-between;z-index:5}
 #nav button{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;min-width:48px;padding:0 12px;border-radius:var(--pill);font:600 15px/18px var(--f-t);transition:background-color .25s,color .25s,padding .25s}
-#nav button span{display:none}
+#nav button span{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:-8px;transition:max-width .3s cubic-bezier(.2,.8,.2,1),opacity .2s,margin .3s}
+#nav.in{animation:navIn .35s cubic-bezier(.2,.8,.2,1) backwards}
 #nav button.on{background:var(--butter);color:var(--on-color);padding:0 18px 0 14px}
-#nav button.on span{display:inline}
+#nav button.on span{max-width:120px;opacity:1;margin-left:0}
 
 /* ===== ÉCRAN DE PARTIE ===== */
 .scr{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto}
@@ -345,6 +354,7 @@ h1,h2,h3,p{margin:0}
 @media (max-height:740px){.opl{margin-top:6px}.opl>div{padding:6px 8px}.lob{padding:14px 18px}.lob .code{font-size:44px}.lob .art{width:80px;height:80px}.seat{min-height:48px;padding:8px 12px}.seat .ttl{font-size:17px}.rk>div{padding:8px 14px}.sent{padding-top:10px}}
 
 /* ===== POPUP (feuille) ===== */
+#modal.closing{animation:fadeOut .24s ease-in both;pointer-events:none}#modal.closing .sheet{animation:down .26s cubic-bezier(.5,0,.75,0) both}
 #modal{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fade .2s both}
 .sheet{width:100%;max-width:480px;max-height:92dvh;overflow:hidden;background:var(--surface);border-radius:var(--r-lg) var(--r-lg) 0 0;padding:12px var(--g) calc(var(--safe-b) + 20px);box-shadow:var(--sheet);animation:up .32s cubic-bezier(.2,.8,.2,1) both}
 .sheet .hdl{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 18px}
@@ -876,6 +886,9 @@ const factOf=q=>{if(AN2[q[0]])return AN2[q[0]];const a=ANEC.find(a=>a[0].test(q[
 function record(q,pen){S.hist.push(Math.round(100-pen));S.hist=S.hist.slice(-60);
   const k=catOf(q),c=S.cat[k]||[0,0];S.cat[k]=[c[0]+1,c[1]+100-pen]}
 function replay(el,c){el.classList.remove(c);void el.offsetWidth;el.classList.add(c)}
+/* Quand une zone change vraiment de contenu (texte différent), elle apparaît en fondu au lieu de basculer d'un coup */
+function softSwap(){["#gMid","#gBot","#dMid","#dBot","#oMid","#oBot","#lvGrid","#statBox"].forEach(q=>{const el=$(q);if(!el)return;el._tx=el.textContent;
+  new MutationObserver(()=>{const t=el.textContent;if(t===el._tx)return;el._tx=t;replay(el,"swap")}).observe(el,{childList:true})})}
 function stagger(c){[...c.children].forEach((e,i)=>e.style.setProperty("--i",Math.min(i,12)));replay(c,"stg")}
 function countTo(el,from,to,ms=800,suf="",f0=fc){if(!el)return;const t0=performance.now();
   (function f(t){if(!el.isConnected)return;const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);el.textContent=f0(from+(to-from)*e)+suf;if(k<1)requestAnimationFrame(f)})(t0)}
@@ -895,9 +908,11 @@ addEventListener("pointermove",e=>{if(!eyesEl||!eyesEl.isConnected)return;const 
   eyesEl.style.setProperty("--px",(dx/d*k).toFixed(1)+"px");eyesEl.style.setProperty("--py",(dy/d*k).toFixed(1)+"px")},{passive:true});
 
 /* ===== POPUP EN FEUILLE ===== */
-function sheet(title,html,actions){$("#sheet").innerHTML=`<div class="hdl"></div><h2 class="d-lg">${title}</h2>${html}<div class="acts">${actions||'<button class="btn" data-close>Fermer</button>'}</div>`;
-  $("#modal").classList.remove("hide");$$("#sheet [data-close]").forEach(b=>b.onclick=()=>{hap(H.tap);closeSheet()})}
-const closeSheet=()=>$("#modal").classList.add("hide");
+let shT;function sheet(title,html,actions){const M=$("#modal"),was=!M.classList.contains("hide");clearTimeout(shT);M.classList.remove("closing");$("#sheet").innerHTML=`<div class="hdl"></div><h2 class="d-lg">${title}</h2>${html}<div class="acts">${actions||'<button class="btn" data-close>Fermer</button>'}</div>`;
+  M.classList.remove("hide");if(was)replay($("#sheet"),"swc");$$("#sheet [data-close]").forEach(b=>b.onclick=()=>{hap(H.tap);closeSheet()})}
+/* Fermeture animée : la feuille redescend, le voile s'efface, puis on masque */
+function closeSheet(){const M=$("#modal");if(M.classList.contains("hide")||M.classList.contains("closing"))return;M.classList.add("closing");
+  clearTimeout(shT);shT=setTimeout(()=>{M.classList.add("hide");M.classList.remove("closing")},260)}
 $("#modal").onclick=e=>{if(e.target.id==="modal")closeSheet()};
 addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#modal").classList.contains("hide"))closeSheet()});
 function ask(title,text,label,cb){sheet(title,`<p class="lead">${text}</p>`,`<button class="btn btn-danger" id="askOk">${label}</button><button class="btn btn-out" data-close>Annuler</button>`);
@@ -919,7 +934,7 @@ let curTab="home";
 addEventListener("contextmenu",e=>{if(!e.target.closest("textarea,input"))e.preventDefault()});
 addEventListener("selectstart",e=>{if(!e.target.closest||!e.target.closest("textarea,input"))e.preventDefault()});
 function tab(t){curTab=t;eyesEl=null;D=null;
-  $("#game").classList.add("hide");$("#duel").classList.add("hide");$("#online").classList.add("hide");$("#nav").classList.remove("hide");
+  $("#game").classList.add("hide");$("#duel").classList.add("hide");$("#online").classList.add("hide");const nv=$("#nav");if(nv.classList.contains("hide")){nv.classList.remove("hide");replay(nv,"in")}
   $$(".tab").forEach(e=>e.classList.add("hide"));const el=$("#t-"+t);el.classList.remove("hide");replay(el,"view");
   $$("#nav button").forEach(b=>{const on=b.dataset.t===t;b.classList.toggle("on",on);on?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current")});
   ({home:renderHome,levels:renderLevels,stats:renderStats,set:renderSet})[t]();scrollTo(0,0)}
@@ -1007,6 +1022,8 @@ function renderStats(){
 /* ===== RÉGLAGES ===== */
 let DP=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();DP=e});
 const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+/* Interrupteurs mis à jour sur place : le curseur glisse au lieu de réafficher toute la liste */
+function swSet(id,on){const w=$(id+" .sw");if(!w)return;w.classList.toggle("on",on);w.setAttribute("aria-checked",on)}
 function renderSet(){
   const nq=CUS.length;
   $("#setList").innerHTML=`
@@ -1019,14 +1036,16 @@ function renderSet(){
    ${standalone?"":`<button class="row" id="sInst"><span class="ri c-bubble">${ic("dl")}</span><span class="rt"><b>Installer l'application</b><small>Sur l'écran d'accueil, en plein écran</small></span><span class="go">${ic("chev")}</span></button>`}
    <button class="row" id="sAbout"><span class="ri c-electric">${ic("info")}</span><span class="rt"><b>À propos</b><small>Version, créateur</small></span><span class="go">${ic("chev")}</span></button>
    <button class="row danger" id="sReset">Réinitialiser la progression</button>`;
-  $("#sSfx").onclick=()=>{S.sfx=!S.sfx;save();renderSet();hap(H.ok)};
-  $("#sMus").onclick=()=>{S.mus=!S.mus;save();renderSet();hap(H.ok);musSync()};
-  $("#sHap").onclick=()=>{S.hap=!S.hap;save();renderSet();hap(H.ok)};
-  $$("[data-th]").forEach(b=>b.onclick=()=>{hap(H.tap);S.theme=b.dataset.th;save();applyTheme();renderSet()});
+  $("#sSfx").onclick=()=>{S.sfx=!S.sfx;save();swSet("#sSfx",S.sfx);hap(H.ok)};
+  $("#sMus").onclick=()=>{S.mus=!S.mus;save();swSet("#sMus",S.mus);hap(H.ok);musSync()};
+  $("#sHap").onclick=()=>{S.hap=!S.hap;save();swSet("#sHap",S.hap);hap(H.ok)};
+  $$("[data-th]").forEach(b=>b.onclick=()=>{if(S.theme===b.dataset.th)return;hap(H.tap);S.theme=b.dataset.th;save();
+    $$("[data-th]").forEach(x=>{const on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-checked",on)});
+    document.startViewTransition&&!matchMedia("(prefers-reduced-motion:reduce)").matches?document.startViewTransition(applyTheme):applyTheme()});
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.11</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.12</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};
@@ -1453,7 +1472,7 @@ function vEnd(){const R=O.R,P=R.players,cap=R.m==="cap",host=hostId()===ME;padOn
   if(O.ek!==R.g){O.ek=R.g;const w=top.includes(ME);hap(w?H.win:H.lose)}
   eyesEl=null;fit($("#oMid"))}
 
-S.run&&S.run.ph?show():tab("home");
+softSwap();S.run&&S.run.ph?show():tab("home");
 </script>
 </body>
 </html>
