@@ -767,19 +767,20 @@ function unitOf(q){if(q[2])return /avant J/.test(q[0])?"av. J.-C.":"année";
   if(/incluse|inclus|sans|brevet|pièces|mesure|compartiments|Barnard|édition|selon|soudées/i.test(u))return"";
   return /^(m|km|cm|mm|g|mg|kg|tonnes|°C|K|V|W|MW|kWh|ch|ans|jours|heures|minutes|secondes|hectares|litres|L|cl|ml|carats|kcal|dB|Hz|%|gigawatts|miles par heure|×10²³)$|km|m²|m³|°C|lumière|millions|milliards|milliers|masses|m\/s|années/.test(u)?u:""}
 
-/* ===== MUSIQUE : thème « Lobby » en boucle dans les menus et le salon en ligne, coupé pendant les parties ===== */
-const MUS=new Audio("audio/lobby.mp3");MUS.loop=true;MUS.preload="auto";const MVOL=.35;let musOn=false;
-function musWant(){if(!S.mus||document.hidden)return false;
+/* ===== MUSIQUE : « Lobby » dans les menus et le salon en ligne, « Focus » pendant les parties ; fondu enchaîné ===== */
+const TR={lobby:new Audio("audio/lobby.mp3"),focus:new Audio("audio/focus.mp3")},MVOL={lobby:.35,focus:.25};
+Object.values(TR).forEach(a=>{a.loop=true;a.preload="auto";a.volume=0});
+function musWant(){if(!S.mus||document.hidden)return null;
   const vis=id=>{const e=document.getElementById(id);return e&&!e.classList.contains("hide")};
-  if(vis("game")||vis("duel"))return false;
-  if(vis("online"))return typeof O!=="undefined"&&O&&O.R?(O.R.state||"lobby")==="lobby":true;
-  return true}
+  if(vis("game")||vis("duel"))return"focus";
+  if(vis("online"))return(typeof O!=="undefined"&&O&&O.R&&(O.R.state||"lobby")!=="lobby")?"focus":"lobby";
+  return"lobby"}
 function musSync(){const w=musWant();
-  if(w&&!musOn){musOn=true;MUS.play().then(()=>{if(!musOn)MUS.pause()}).catch(()=>{musOn=false})}
-  const t=w?MVOL:0,v=MUS.volume;
-  if(Math.abs(v-t)>.01)MUS.volume=Math.max(0,Math.min(1,v+(t-v)*.25));else MUS.volume=t;
-  if(!w&&musOn&&MUS.volume<=.02){MUS.pause();musOn=false}}
-MUS.volume=0;setInterval(musSync,120);
+  for(const k in TR){const a=TR[k],t=k===w?MVOL[k]:0;
+    if(t>0&&a.paused&&!a._p){a._p=1;a.play().catch(()=>{}).then(()=>{a._p=0})}
+    const v=a.volume;a.volume=Math.abs(v-t)>.01?Math.max(0,Math.min(1,v+(t-v)*.2)):t;
+    if(t===0&&a.volume<=.02&&!a.paused&&!a._p)a.pause()}}
+setInterval(musSync,120);
 ["pointerdown","keydown","touchend"].forEach(e=>addEventListener(e,musSync,{passive:true}));
 document.addEventListener("visibilitychange",musSync);
 
@@ -958,7 +959,7 @@ function renderSet(){
   const nq=CUS.length;
   $("#setList").innerHTML=`
    <button class="row" id="sHap"><span class="ri c-butter">${ic("vib")}</span><span class="rt"><b>Vibrations</b><small>Retours haptiques</small></span><span class="sw ${S.hap?"on":""}" role="switch" aria-checked="${S.hap}"><i></i></span></button>
-   <button class="row" id="sMus"><span class="ri c-bubble">${ic("note")}</span><span class="rt"><b>Musique</b><small>Thème du menu et des salons</small></span><span class="sw ${S.mus?"on":""}" role="switch" aria-checked="${S.mus}"><i></i></span></button>
+   <button class="row" id="sMus"><span class="ri c-bubble">${ic("note")}</span><span class="rt"><b>Musique</b><small>Ambiance des menus et des parties</small></span><span class="sw ${S.mus?"on":""}" role="switch" aria-checked="${S.mus}"><i></i></span></button>
    <div class="row"><span class="ri c-sky">${ic("moon")}</span><span class="rt"><b>Thème</b></span><span class="seg" role="radiogroup" aria-label="Thème">${[["auto","Auto"],["light","Clair"],["dark","Sombre"]].map(([k,l])=>`<button role="radio" aria-checked="${S.theme===k}" class="${S.theme===k?"on":""}" data-th="${k}">${l}</button>`).join("")}</span></div>
    <button class="row" id="sRules"><span class="ri c-tomato">${ic("book")}</span><span class="rt"><b>Règles du jeu</b><small>Capital, étoiles, jokers, défi</small></span><span class="go">${ic("chev")}</span></button>
    <button class="row" id="sImp"><span class="ri c-olive">${ic("pm")}</span><span class="rt"><b>Mes questions</b><small>${N-nq} dans le jeu${nq?` + ${nq} ajoutée${nq>1?"s":""}`:""}</small></span><span class="go">${ic("chev")}</span></button>
@@ -971,7 +972,7 @@ function renderSet(){
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.4</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.5</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};
