@@ -362,7 +362,7 @@ textarea:focus{border-color:var(--ink)}
 .msg{margin-top:10px;font-weight:600;font-size:15px}
 
 /* Toast */
-#toast{position:fixed;left:50%;bottom:calc(var(--safe-b) + 100px);transform:translateX(-50%);max-width:calc(100% - 48px);padding:12px 18px;border-radius:var(--pill);background:var(--action);color:var(--on-action);font:600 15px/18px var(--f-t);z-index:30;animation:pop .25s both;text-align:center}
+#toast{position:fixed;left:0;right:0;margin:0 auto;bottom:calc(var(--safe-b) + 100px);width:min(432px,calc(100% - 48px));box-sizing:border-box;padding:12px 18px;border-radius:var(--pill);background:var(--action);color:var(--on-action);font:600 15px/18px var(--f-t);z-index:30;animation:pop .25s both;text-align:center}
 </style>
 </head>
 <body>
@@ -768,28 +768,18 @@ function unitOf(q){if(q[2])return /avant J/.test(q[0])?"av. J.-C.":"année";
   if(/incluse|inclus|sans|brevet|pièces|mesure|compartiments|Barnard|édition|selon|soudées/i.test(u))return"";
   return /^(m|km|cm|mm|g|mg|kg|tonnes|°C|K|V|W|MW|kWh|ch|ans|jours|heures|minutes|secondes|hectares|litres|L|cl|ml|carats|kcal|dB|Hz|%|gigawatts|miles par heure|×10²³)$|km|m²|m³|°C|lumière|millions|milliards|milliers|masses|m\/s|années/.test(u)?u:""}
 
-/* ===== MUSIQUE : « Lobby » dans les menus et le salon en ligne, « Focus » pendant les parties ; fondu enchaîné ===== */
-const TR={lobby:new Audio("audio/lobby.mp3"),focus:new Audio("audio/focus.mp3")},MVOL={lobby:.35,focus:.25};
-Object.values(TR).forEach(a=>{a.loop=true;a.preload="auto";a.volume=0});
-function musWant(){if(!S.mus||document.hidden)return null;
-  const vis=id=>{const e=document.getElementById(id);return e&&!e.classList.contains("hide")};
-  if(vis("game")||vis("duel"))return"focus";
-  if(vis("online"))return(typeof O!=="undefined"&&O&&O.R&&(O.R.state||"lobby")!=="lobby")?"focus":"lobby";
-  return"lobby"}
-function musSync(){const w=musWant();
-  for(const k in TR){const a=TR[k],t=k===w?MVOL[k]:0;
-    if(t>0&&a.paused&&!a._p){a._p=1;a.play().catch(()=>{}).then(()=>{a._p=0})}
-    const v=a.volume;a.volume=Math.abs(v-t)>.01?Math.max(0,Math.min(1,v+(t-v)*.2)):t;
-    if(t===0&&a.volume<=.02&&!a.paused&&!a._p)a.pause()}}
+/* ===== MUSIQUE : un seul thème (« Lobby »), en boucle et sans coupure du menu aux parties ; fondu à l'entrée et à la sortie ===== */
+const MU=new Audio("audio/lobby.mp3"),MV=.3;MU.loop=true;MU.preload="auto";MU.volume=0;let muP=0;
+function musSync(){const t=S.mus&&!document.hidden?MV:0;
+  if(t>0&&MU.paused&&!muP){muP=1;MU.play().catch(()=>{}).then(()=>{muP=0})}
+  const v=MU.volume;MU.volume=Math.abs(v-t)>.01?Math.max(0,Math.min(1,v+(t-v)*.2)):t;
+  if(t===0&&MU.volume<=.02&&!MU.paused&&!muP)MU.pause()}
 setInterval(musSync,120);
 /* Les navigateurs interdisent tout son avant un geste : on tente dès le chargement, puis à chaque type de geste reconnu (capture) jusqu'au démarrage effectif */
 ["pointerdown","pointerup","touchstart","touchend","mousedown","click","keydown"].forEach(e=>addEventListener(e,musSync,{passive:true,capture:true}));
 addEventListener("pageshow",musSync);addEventListener("load",musSync);
 document.addEventListener("visibilitychange",musSync);
 
-/* ===== VIBRATIONS ===== */
-const hl=document.createElement("label");hl.style.cssText="position:fixed;left:-99px;top:0;opacity:0";hl.setAttribute("aria-hidden","true");
-hl.innerHTML='<input type="checkbox" switch tabindex="-1">';document.body.appendChild(hl);
 /* Chaque motif porte le nom de son bruitage (.s) : un seul appel hap() donne la vibration et le son */
 const tg=(a,n)=>(a.s=n,a);
 function hap(p){if(p&&p.s)sfx(p.s);if(!S.hap)return;p=[].concat(p);if(navigator.vibrate){navigator.vibrate(p);return}
@@ -1015,7 +1005,7 @@ function renderSet(){
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.6</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.7</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};

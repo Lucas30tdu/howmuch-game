@@ -43,7 +43,7 @@ Pour installer le jeu comme une appli : sur iPhone, bouton Partager puis « Sur 
 
 ## Musique
 
-Deux thèmes en boucle, avec fondu enchaîné : « HowMuch? Lobby » (`audio/lobby.mp3`) dans les menus et le salon d'attente en ligne, « HowMuch? Focus » (`audio/focus.mp3`) pendant les parties (solo, défi, duel, en ligne). Une coche **Musique** dans les Réglages permet de tout désactiver (le navigateur exige un premier toucher avant de lancer le son).
+Un seul thème, « HowMuch? Lobby » (`audio/lobby.mp3`), en boucle et sans coupure du menu aux parties. Une coche **Musique** dans les Réglages permet de la désactiver (le navigateur exige un premier geste avant de lancer le son).
 
 ## Bruitages
 
