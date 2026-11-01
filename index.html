@@ -353,6 +353,57 @@ h1,h2,h3,p{margin:0}
 .or::before,.or::after{content:"";flex:1;border-top:2px solid var(--line)}
 @media (max-height:740px){.opl{margin-top:6px}.opl>div{padding:6px 8px}.lob{padding:14px 18px}.lob .code{font-size:44px}.lob .art{width:80px;height:80px}.seat{min-height:48px;padding:8px 12px}.seat .ttl{font-size:17px}.rk>div{padding:8px 14px}.sent{padding-top:10px}}
 
+/* ===== MÉDAILLES ===== */
+.tab>.medHero{flex:none;height:clamp(150px,30dvh,280px);position:relative;margin:12px 0;padding:20px;border-radius:var(--r-lg);display:flex;flex-direction:column;justify-content:flex-end;gap:4px;overflow:hidden;animation:pop .3s both}
+.medHero .art{position:absolute;right:-4px;top:-4px;width:min(140px,36%);aspect-ratio:1}
+.medHero .n-xl{line-height:1}
+.medHero .prog{max-width:62%}
+.medHero .nx{margin-top:8px;max-width:72%}
+#medBar button{font-size:14px;padding:0 6px;white-space:nowrap}
+.tiers button .ct-n{font:900 11px/1 var(--f-n);margin-left:5px;opacity:.7}
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;align-content:start}
+.tab>.mg{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:8px 0 12px;margin-top:4px!important;-webkit-mask-image:linear-gradient(transparent,#000 10px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(transparent,#000 10px,#000 calc(100% - 14px),transparent)}
+.mg::-webkit-scrollbar{display:none}
+.mb{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px 8px;border-radius:16px;background:var(--raised);min-width:0}
+.mb .md{width:46px;height:52px;flex:none}
+.mb .nm{font:600 11px/13px var(--f-t);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px}
+.mb.lock .nm{color:var(--muted)}
+.mb .mp{width:70%;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden}
+.mb .mp i{display:block;height:100%;background:var(--ink);border-radius:2px}
+.mb .nw{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--tomato);box-shadow:0 0 0 2px var(--raised);animation:pop .3s both}
+.mb.on .md{animation:medIn .5s cubic-bezier(.3,1.4,.5,1) backwards;animation-delay:calc(var(--i,0)*45ms + .1s)}
+@keyframes medIn{from{transform:scale(.6) rotate(-14deg);opacity:0}to{transform:none;opacity:1}}
+.md .rb{fill:var(--ink)}.md .cr{stroke:var(--ink);stroke-width:3}
+.md.off .rb{fill:var(--line)}.md.off .cr{fill:var(--sunken);stroke:var(--line)}
+.md .gl{color:var(--on-color);fill:var(--on-color)}.md.off .gl{color:var(--muted);fill:var(--muted);opacity:.55}
+.md .gi{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.md .lk{fill:var(--surface);stroke:var(--line);stroke-width:2}
+.md .lki{fill:none;stroke:var(--muted);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.mdBig{display:flex;justify-content:center;margin:2px 0 14px}
+.mdBig .md{width:112px;height:126px}
+.mdBig .md:not(.off){animation:medIn .6s cubic-bezier(.3,1.4,.5,1) both}
+.mdSt{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:var(--r-md);background:var(--raised)}
+.mdSt .bar{height:10px;border-radius:5px;background:var(--sunken);overflow:hidden}
+.mdSt .bar i{display:block;height:100%;border-radius:5px;background:var(--ink)}
+.mdSt .rw{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#nav button{position:relative}
+#nav button .dt{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--tomato);box-shadow:0 0 0 2px var(--action);animation:pop .3s both}
+#nav button.on .dt{display:none}
+@media (max-width:380px){#nav{padding:0 6px}#nav button{min-width:44px;padding:0 10px}#nav button.on{padding:0 14px 0 12px}}
+@media (max-height:700px){.mb .md{width:40px;height:45px}.mb{padding:6px 2px}.tab>.medHero{height:118px;padding:14px 18px}.medHero>.eyebrow,.medHero .art{display:none}.medHero .n-xl{font-size:40px}.medHero .nx{max-width:100%;margin-top:4px}.medHero .prog{max-width:100%;margin-top:6px}}
+@media (max-width:380px){.mb .nm{font-size:10px;padding:0 2px}#medBar button{font-size:13px;padding:0 4px}}
+@media (max-width:340px){#medBar .ct-n{display:none}#nav button.on span{max-width:0;margin-left:-8px}#nav button.on{padding:0 12px}}
+/* Bandeau « Médaille débloquée » */
+#medT{position:fixed;left:50%;top:calc(var(--safe-t) + 12px);transform:translateX(-50%);width:min(432px,calc(100% - 32px));display:flex;align-items:center;gap:12px;padding:10px 18px 10px 12px;border-radius:var(--r-md);background:var(--action);color:var(--on-action);z-index:31;animation:mtIn .45s cubic-bezier(.2,.9,.3,1.15) both;cursor:pointer}
+#medT .md{width:44px;height:50px;flex:none;animation:medIn .6s .15s cubic-bezier(.3,1.4,.5,1) backwards}
+#medT .md .rb{fill:var(--on-action)}#medT .md .cr{stroke:var(--on-action)}
+#medT .eyebrow{opacity:.7;display:block}
+#medT b{font:700 16px/20px var(--f-t);display:block}
+#medT.out{animation:mtOut .3s ease-in both}
+@keyframes mtIn{from{opacity:0;transform:translate(-50%,-30px) scale(.96)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes mtOut{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-24px)}}
+@media (prefers-reduced-motion:reduce){.mb.on .md,.mdBig .md,#medT,#medT .md{animation:none!important}}
+
 /* ===== POPUP (feuille) ===== */
 #modal.closing{animation:fadeOut .24s ease-in both;pointer-events:none}#modal.closing .sheet{animation:down .26s cubic-bezier(.5,0,.75,0) both}
 #modal{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fade .2s both}
@@ -411,6 +462,14 @@ textarea:focus{border-color:var(--ink)}
   <div id="statBox"></div>
 </main>
 
+<!-- MÉDAILLES -->
+<main id="t-med" class="tab hide" aria-label="Médailles">
+  <div class="hd"><span class="eyebrow muted">Tes succès</span><h1 class="d-lg">Médailles</h1></div>
+  <div class="medHero c-butter oc" id="medHero"></div>
+  <div class="tiers" id="medBar" role="tablist" aria-label="Catégories de médailles"></div>
+  <div class="mg" id="medGrid" style="margin-top:12px"></div>
+</main>
+
 <!-- RÉGLAGES -->
 <main id="t-set" class="tab hide" aria-label="Réglages">
   <div class="hd"><span class="eyebrow muted">Ton jeu, tes règles</span><h1 class="d-lg">Réglages</h1></div>
@@ -460,9 +519,10 @@ textarea:focus{border-color:var(--ink)}
 
 <div id="modal" class="hide" role="dialog" aria-modal="true"><div class="sheet" id="sheet"></div></div>
 <div id="toast" class="hide" role="status" aria-live="polite"></div>
+<div id="medT" class="hide" role="status" aria-live="polite"></div>
 
 <nav id="nav" aria-label="Navigation">
-  <button data-t="home" class="on"></button><button data-t="levels"></button><button data-t="stats"></button><button data-t="set"></button>
+  <button data-t="home" class="on"></button><button data-t="levels"></button><button data-t="stats"></button><button data-t="med"></button><button data-t="set"></button>
 </nav>
 </div>
 <script>
@@ -757,6 +817,9 @@ const I={
  dl:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',chev:'<path d="M9 6l6 6-6 6"/>',pm:'<path d="M5 12h6M8 9v6M14 15l5-6"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
  spk:'<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9.5a3.5 3.5 0 010 5M18 7a7 7 0 010 10"/>',
  note:'<path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2.5"/><circle cx="17" cy="16" r="2.5"/>',
+ medal:'<circle cx="12" cy="14" r="6"/><path d="M8.5 9.2L6 3h4l2 4M15.5 9.2L18 3h-4l-2 4"/>',
+ flag:'<path d="M6 21V4M6 4h11l-2.5 4L17 12H6"/>',crown:'<path d="M4 18h16M5 15l-1-9 5 4 3-6 3 6 5-4-1 9z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',enter:'<path d="M10 4h8v16h-8"/><path d="M3 12h11M10 8l4 4-4 4"/>',
  clock:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2.5h4"/>',share:'<path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v8h14v-8"/>'
 };
 const ic=(k,c="i")=>`<svg class="${c}" viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>`;
@@ -814,7 +877,7 @@ addEventListener("pageshow",musSync);document.addEventListener("visibilitychange
 const tg=(a,n)=>(a.s=n,a);
 function hap(p){if(p&&p.s)sfx(p.s);if(!S.hap)return;p=[].concat(p);if(navigator.vibrate){navigator.vibrate(p);return}
   let t=0;p.forEach((d,i)=>{if(i%2===0)setTimeout(()=>hl.click(),t);t+=d})}
-const H={tap:tg([8],"tap"),ok:tg([14],"ok"),good:tg([12,50,12],"perfect"),win:tg([12,40,12,40,40],"win"),lose:tg([70,60,70,60,140],"lose"),joker:tg([10,30,18],"joker"),star:tg([10],"star"),
+const H={tap:tg([8],"tap"),ok:tg([14],"ok"),good:tg([12,50,12],"perfect"),win:tg([12,40,12,40,40],"win"),lose:tg([70,60,70,60,140],"lose"),joker:tg([10,30,18],"joker"),star:tg([10],"star"),medal:tg([10,40,10,40,24],"medal"),
   err:tg([30,40,30],"err"),tick:tg([6],"tick"),
   loss:p=>p<10?tg([16],"near"):p<40?tg([24,50,24],"mid"):tg([40,50,40,50,70],"far")};
 
@@ -849,14 +912,19 @@ const SFX={
   joker:t=>{[88,91,96].forEach((n,i)=>tone(NT(n),t+i*.045,{d:.25,v:.13,bright:.1}));puff(t,{f:6000,d:.12,v:.05})},          // joker : scintillement
   star:t=>{const k=performance.now()-starT<900?++starN:(starN=0);starT=performance.now();tone(NT([84,88,91][Math.min(k,2)]),t,{d:.7,v:.2,bright:.4})},  // étoiles : verre, une note de plus par étoile
   win:t=>{[60,64,67,72].forEach((n,i)=>tone(NT(n+12),t+i*.09,{d:.45,v:.22}));[72,76,79].forEach(n=>tone(NT(n+12),t+.4,{d:1.1,v:.11,bright:.1}))},  // niveau gagné : arpège + accord tenu
+  medal:t=>{[79,86,91,98].forEach((n,i)=>tone(NT(n),t+i*.07,{d:.8,v:.16,bright:.35}));puff(t+.3,{f:7000,d:.15,v:.04})},   // médaille : carillon clair
   lose:t=>{[67,63,60].forEach((n,i)=>tone(NT(n),t+i*.16,{d:.45,v:.22,type:"triangle",bright:0}));tone(NT(55),t+.5,{d:.8,v:.14,type:"triangle",bright:0,to:NT(53)})}  // perdu : descente mineure, feutrée
 };
 function sfx(n){if(!S||!S.sfx||document.hidden||!SFX[n])return;const a=acx();if(!a)return;try{SFX[n](a.currentTime+.005)}catch(e){}}
 
 /* ===== ÉTAT & SAUVEGARDE ===== */
-const DEF=()=>({v:7,seen:[],max:1,run:null,hap:true,mus:true,sfx:true,theme:"auto",stars:{},hist:[],cat:{},daily:null,streak:{d:"",n:0}});
+/* ach : médailles — u : débloquées {id: date}, g : parties terminées, ex : réponses exactes, du : duels,
+   cr : salons créés, jo : salons rejoints, ow : victoires en ligne, wk/xk : parties et questions en ligne déjà comptées, nw : non vues */
+const ACH0=()=>({u:{},g:0,ex:0,du:0,cr:0,jo:0,ow:0,wk:[],xk:[],nw:[]});
+const DEF=()=>({v:7,seen:[],max:1,run:null,hap:true,mus:true,sfx:true,theme:"auto",stars:{},hist:[],cat:{},daily:null,streak:{d:"",n:0},ach:ACH0()});
 let S;try{const p=JSON.parse(localStorage.getItem(KEY))||{};if(p.v!==7){p.run=null;p.seen=[]}S=Object.assign(DEF(),p,{v:7})}catch(e){S=DEF()}   // v7 : base enrichie, index des questions renumérotés
 S.cat=Object.fromEntries(Object.entries(S.cat||{}).filter(([k])=>CATS[k]));   // anciennes catégories ignorées
+S.ach=Object.assign(ACH0(),S.ach||{});
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const today=()=>new Date().toLocaleDateString("sv-SE");
 const yest=()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toLocaleDateString("sv-SE")};
@@ -927,7 +995,7 @@ function rules(){const L=[["tomato","50 niveaux de 6 questions. Chaque réponse 
   sheet("Règles du jeu",`<ol class="rules">${L.map((x,i)=>`<li><b class="c-${x[0]}">${i+1}</b><span>${x[1]}</span></li>`).join("")}</ol>`,'<button class="btn" data-close>C\'est parti</button>')}
 
 /* ===== NAVIGATION ===== */
-const NAV={home:["home","Accueil"],levels:["levels","Niveaux"],stats:["stats","Précision"],set:["gear","Réglages"]};
+const NAV={home:["home","Accueil"],levels:["levels","Niveaux"],stats:["stats","Précision"],med:["medal","Médailles"],set:["gear","Réglages"]};
 $$("#nav button").forEach(b=>{const[k,l]=NAV[b.dataset.t];b.innerHTML=ic(k)+`<span>${l}</span>`;b.setAttribute("aria-label",l);b.onclick=()=>{hap(H.tap);if(b.dataset.t===curTab&&$("#game").classList.contains("hide")&&$("#duel").classList.contains("hide")&&$("#online").classList.contains("hide")){scrollTo({top:0,behavior:"smooth"});return}tab(b.dataset.t)}});
 let curTab="home";
 /* Comportement d'application : pas de menu « Copier » ni de sélection au toucher long, sauf dans les champs de saisie */
@@ -937,7 +1005,7 @@ function tab(t){curTab=t;eyesEl=null;D=null;
   $("#game").classList.add("hide");$("#duel").classList.add("hide");$("#online").classList.add("hide");const nv=$("#nav");if(nv.classList.contains("hide")){nv.classList.remove("hide");replay(nv,"in")}
   $$(".tab").forEach(e=>e.classList.add("hide"));const el=$("#t-"+t);el.classList.remove("hide");replay(el,"view");
   $$("#nav button").forEach(b=>{const on=b.dataset.t===t;b.classList.toggle("on",on);on?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current")});
-  ({home:renderHome,levels:renderLevels,stats:renderStats,set:renderSet})[t]();scrollTo(0,0)}
+  ({home:renderHome,levels:renderLevels,stats:renderStats,med:()=>{if(S.ach.nw.length)medSel=MED.find(m=>m.id===S.ach.nw[0]).k;renderMed()},set:renderSet})[t]();medDot();scrollTo(0,0)}
 
 /* ===== ACCUEIL ===== */
 $("#rulesBtn").innerHTML=ic("q");$("#rulesBtn").onclick=()=>{hap(H.tap);rules()};
@@ -1019,6 +1087,79 @@ function renderStats(){
      <div><div class="cap" style="font-weight:600">${CATS[k].n}</div><div class="n-sm">${p==null?"—":p+NB+"%"}</div></div></div>`).join("")}</div>`;
   stagger($(".cgrid"))}
 
+/* ===== MÉDAILLES : 16 succès en 3 catégories ===== */
+const nStar=k=>{let n=0;for(let l=1;l<=50;l++)if((S.stars[l]||0)>=k)n++;return n};
+const MCAT=[["prog","Progression"],["prec","Précision"],["amis","Entre amis"]];
+/* g : contenu de la médaille — t : texte, i : icône, s : nombre d'étoiles */
+const MED=[
+ {id:"first",k:"prog",n:"Premiers pas",d:"Termine ta première partie, gagnée ou perdue.",c:"tomato",g:{i:"flag"},v:()=>S.ach.g,t:1},
+ {id:"lv10",k:"prog",n:"Niveau 10",d:"Atteins le niveau 10.",c:"butter",g:{t:"10"},v:()=>S.max,t:10},
+ {id:"lv20",k:"prog",n:"Niveau 20",d:"Atteins le niveau 20.",c:"olive",g:{t:"20"},v:()=>S.max,t:20},
+ {id:"lv30",k:"prog",n:"Niveau 30",d:"Atteins le niveau 30.",c:"sky",g:{t:"30"},v:()=>S.max,t:30},
+ {id:"lv40",k:"prog",n:"Niveau 40",d:"Atteins le niveau 40.",c:"bubble",g:{t:"40"},v:()=>S.max,t:40},
+ {id:"lv50",k:"prog",n:"Fin du jeu",d:"Termine le niveau 50, avec au moins une étoile dans chaque niveau.",c:"electric",g:{t:"50"},v:()=>nStar(1),t:50,u:"niveaux avec 1 étoile"},
+ {id:"st2",k:"prog",n:"Deux étoiles",d:"Obtiens au moins deux étoiles dans chacun des 50 niveaux.",c:"butter",g:{s:2},v:()=>nStar(2),t:50,u:"niveaux avec 2 étoiles"},
+ {id:"st3",k:"prog",n:"100 %",d:"Obtiens les trois étoiles dans tous les niveaux.",c:"tomato",g:{s:3},v:()=>nStar(3),t:50,u:"niveaux avec 3 étoiles"},
+ {id:"ex5",k:"prec",n:"Dans le mille",d:"Donne 5 réponses exactes, au chiffre près.",c:"olive",g:{i:"target",t:"5"},v:()=>S.ach.ex,t:5,u:"réponses exactes"},
+ {id:"ex50",k:"prec",n:"Œil de lynx",d:"Donne 50 réponses exactes, au chiffre près.",c:"sky",g:{i:"target",t:"50"},v:()=>S.ach.ex,t:50,u:"réponses exactes"},
+ {id:"ex100",k:"prec",n:"Précision absolue",d:"Donne 100 réponses exactes, au chiffre près.",c:"bubble",g:{i:"target",t:"100"},v:()=>S.ach.ex,t:100,u:"réponses exactes"},
+ {id:"duel",k:"amis",n:"Face à face",d:"Joue une partie en duel sur le même téléphone.",c:"sky",g:{i:"phone"},v:()=>S.ach.du,t:1},
+ {id:"host",k:"amis",n:"Hôte",d:"Crée un salon pour jouer en ligne.",c:"electric",g:{i:"plus"},v:()=>S.ach.cr,t:1},
+ {id:"guest",k:"amis",n:"Invité",d:"Rejoins le salon d'un ami.",c:"olive",g:{i:"enter"},v:()=>S.ach.jo,t:1},
+ {id:"win1",k:"amis",n:"Victoire",d:"Gagne une partie en ligne.",c:"butter",g:{i:"crown"},v:()=>S.ach.ow,t:1},
+ {id:"win10",k:"amis",n:"Champion",d:"Gagne 10 parties en ligne.",c:"tomato",g:{i:"crown",t:"10"},v:()=>S.ach.ow,t:10,u:"victoires en ligne"}];
+const medOn=m=>!!S.ach.u[m.id];
+const medN=()=>MED.filter(medOn).length;
+/* Dessin d'une médaille : rubans, disque coloré, contenu ; cadenas si elle reste à débloquer */
+function medSVG(m,on){const g=m.g,sp=(x,y,k)=>`<path d="${STARP}" transform="translate(${x-12*k} ${y-12*k}) scale(${k})"/>`;
+  let in_="";
+  if(g.s===2)in_=sp(23,30,.78)+sp(41,30,.78);
+  else if(g.s===3)in_=sp(32,23,.7)+sp(22,37,.62)+sp(42,37,.62);
+  else if(g.i&&g.t)in_=`<svg class="gi" x="23" y="11" width="18" height="18" viewBox="0 0 24 24">${I[g.i]}</svg><text x="32" y="39" text-anchor="middle" dominant-baseline="central" style="font:900 ${g.t.length>2?12:15}px var(--f-n);stroke:none">${g.t}</text>`;
+  else if(g.i)in_=`<svg class="gi" x="19" y="17" width="26" height="26" viewBox="0 0 24 24">${I[g.i]}</svg>`;
+  else in_=`<text x="32" y="31" text-anchor="middle" dominant-baseline="central" style="font:900 ${g.t.length>2?15:19}px var(--f-n)">${g.t}</text>`;
+  return`<svg class="md${on?"":" off"}" viewBox="0 0 64 72" aria-hidden="true"><path class="rb" d="M21 46L14 70l10-5 6 6 3-17z"/><path class="rb" d="M43 46l7 24-10-5-6 6-3-17z"/>
+   <circle class="cr" cx="32" cy="30" r="26"${on?` style="fill:var(--${m.c})"`:""}/><g class="gl">${in_}</g>
+   ${on?"":`<circle class="lk" cx="51" cy="49" r="10"/><g transform="translate(44.5 42.5) scale(.54)" class="lki">${I.lock}</g>`}</svg>`}
+let medSel="prog";
+function renderMed(){const n=medN(),T=MED.length,nx=MED.filter(m=>!medOn(m)&&m.t>1).sort((a,b)=>b.v()/b.t-a.v()/a.t)[0];
+  $("#medHero").innerHTML=`${art("surfaces")}<span class="eyebrow">Médailles débloquées</span><div class="n-xl">${n}<small class="cap"> sur ${T}</small></div>
+   <div class="prog" aria-hidden="true"><i style="width:${n/T*100}%"></i></div>
+   <p class="cap nx">${n===T?"Collection complète. Chapeau !":nx?`Prochaine : ${esc(nx.n)} · ${Math.min(nx.v(),nx.t)} sur ${nx.t}`:"Joue une partie pour débloquer ta première médaille."}</p>`;
+  $("#medBar").innerHTML=MCAT.map(([k,l])=>{const L=MED.filter(m=>m.k===k);return`<button role="tab" aria-selected="${k===medSel}" class="${k===medSel?"on":""}" data-mc="${k}">${l}<span class="ct-n">${L.filter(medOn).length}/${L.length}</span></button>`}).join("");
+  $$("[data-mc]").forEach(b=>b.onclick=()=>{if(b.dataset.mc===medSel)return;hap(H.tap);medSel=b.dataset.mc;renderMed();$("#medGrid").scrollTop=0});
+  const L=MED.filter(m=>m.k===medSel);
+  $("#medGrid").innerHTML=L.map(m=>{const on=medOn(m),v=Math.min(m.v(),m.t);
+    return`<button class="mb${on?" on":" lock"}" data-md="${m.id}" aria-label="${esc(m.n)}, ${on?"débloquée":"à débloquer"}">${medSVG(m,on)}<span class="nm">${esc(m.n)}</span>
+     ${!on&&m.t>1?`<span class="mp" aria-hidden="true"><i style="width:${v/m.t*100}%"></i></span>`:""}${S.ach.nw.includes(m.id)?'<span class="nw" aria-hidden="true"></span>':""}</button>`}).join("");
+  $$("[data-md]").forEach(b=>b.onclick=()=>{hap(H.tap);medSheet(MED.find(m=>m.id===b.dataset.md))});
+  stagger($("#medGrid"));
+  if(S.ach.nw.length&&curTab==="med"){const k=S.ach.nw.filter(id=>MED.find(m=>m.id===id).k!==medSel);S.ach.nw=k;save();medDot()}}
+function medSheet(m){const on=medOn(m),v=Math.min(m.v(),m.t),cat=MCAT.find(c=>c[0]===m.k)[1];
+  const st=on?`<div class="rw"><span class="eyebrow muted">Débloquée le</span><b>${new Date(S.ach.u[m.id]).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}</b></div>`
+   :m.t>1?`<div class="rw"><span class="eyebrow muted">Progression</span><b class="n-sm">${v} sur ${m.t}</b></div><div class="bar" aria-hidden="true"><i style="width:${v/m.t*100}%"></i></div>`
+   :`<div class="rw"><span class="eyebrow muted">Statut</span><b>À débloquer</b></div>`;
+  sheet(m.n,`<div class="mdBig">${medSVG(m,on)}</div><span class="eyebrow muted" style="display:block;margin-bottom:6px">${cat}</span><p class="lead">${esc(m.d)}</p><div class="mdSt">${st}</div>`,'<button class="btn" data-close>Fermer</button>');
+  if(on)setTimeout(()=>hap(H.star),250)}
+/* Pastille sur l'onglet Médailles quand une médaille n'a pas encore été vue */
+function medDot(){const b=$('#nav [data-t="med"]');if(!b)return;const d=b.querySelector(".dt"),on=S.ach.nw.length>0&&curTab!=="med";
+  if(on&&!d)b.insertAdjacentHTML("beforeend",'<span class="dt" aria-hidden="true"></span>');if(!on&&d)d.remove();
+  b.setAttribute("aria-label","Médailles"+(on?", nouvelle médaille":""))}
+/* Vérifie les conditions ; les nouvelles médailles s'affichent dans un bandeau (sauf au démarrage) */
+function medCheck(quiet){const nw=MED.filter(m=>!medOn(m)&&m.v()>=m.t);if(!nw.length)return;
+  nw.forEach(m=>{S.ach.u[m.id]=Date.now();if(!S.ach.nw.includes(m.id))S.ach.nw.push(m.id)});save();medDot();
+  if(curTab==="med"&&!$("#t-med").classList.contains("hide"))renderMed();
+  if(!quiet)nw.forEach(m=>medQ.push(m)),medNext()}
+const medQ=[];let medBusy=false,mtT;
+function medNext(){if(medBusy||!medQ.length)return;const m=medQ.shift(),e=$("#medT");medBusy=true;
+  e.innerHTML=`${medSVG(m,true)}<div style="min-width:0"><span class="eyebrow">Médaille débloquée</span><b>${esc(m.n)}</b></div>`;
+  e.classList.remove("hide","out");replay(e,"in");hap(H.medal);
+  const close=()=>{clearTimeout(mtT);e.onclick=null;e.classList.add("out");setTimeout(()=>{e.classList.add("hide");medBusy=false;medNext()},300)};
+  e.onclick=close;mtT=setTimeout(close,3200)}
+const medKey=(a,k)=>{if(a.includes(k))return false;a.push(k);if(a.length>40)a.shift();return true};
+/* Compteurs appelés par le jeu */
+function medExact(q,v){if(Math.abs(q[1]-v)<1e-9){S.ach.ex++;save();setTimeout(()=>medCheck(),900)}}
+
 /* ===== RÉGLAGES ===== */
 let DP=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();DP=e});
 const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
@@ -1045,11 +1186,11 @@ function renderSet(){
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.12</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.13</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};
-  $("#sReset").onclick=()=>{hap(H.tap);ask("Tout effacer ?","Niveaux débloqués, étoiles, statistiques, série et défi du jour seront remis à zéro. Tes questions ajoutées sont conservées.","Tout effacer",()=>{const h=S.hap,t=S.theme,m=S.mus,x=S.sfx;S=DEF();S.hap=h;S.theme=t;S.mus=m;S.sfx=x;tierSel=null;save();tab("home");toast("Progression réinitialisée")})};
+  $("#sReset").onclick=()=>{hap(H.tap);ask("Tout effacer ?","Niveaux débloqués, étoiles, médailles, statistiques, série et défi du jour seront remis à zéro. Tes questions ajoutées sont conservées.","Tout effacer",()=>{const h=S.hap,t=S.theme,m=S.mus,x=S.sfx;S=DEF();S.hap=h;S.theme=t;S.mus=m;S.sfx=x;tierSel=null;save();tab("home");toast("Progression réinitialisée")})};
 }
 /* Import d'une base { level, question, answer } collée telle quelle (sans eval) */
 function parseDB(t){const out=[],re=/\{[^{}]*\}/g;let m;
@@ -1160,7 +1301,7 @@ function setCap(v,anim=true){const r=S.run,from=shown==null?v:shown;shown=v;
   else el.innerHTML=fc(v)+suf}
 function submit(){const r=S.run,q=Q[r.qs[r.i]],v=parseBuf();
   if(!buf||isNaN(v)){replay($(".ans-l"),"shake");hap(H.err);toast("Tape ta réponse sur le pavé");return}
-  padOn=null;const pen=penOf(q,v);r.fb={v,gap:Math.abs(q[1]-v),pen};r.cap=r1(r.cap-pen);r.ph="f";record(q,pen);save();feedback(true)}
+  padOn=null;const pen=penOf(q,v);r.fb={v,gap:Math.abs(q[1]-v),pen};r.cap=r1(r.cap-pen);r.ph="f";record(q,pen);save();feedback(true);medExact(q,v)}
 function verdict(p){return p===0?["Dans le mille.","success","Parfait"]:p<10?["Bien vu !","success",`−${fmt(p)} pts`]:p<35?["Pas mal du tout.","warning",`−${fmt(p)} pts`]:p<70?["Un peu loin.","warning",`−${fmt(p)} pts`]:["Trop loin, cette fois.","danger",`−${fmt(p)} pts`]}
 const STC={success:"electric",warning:"butter",danger:"tomato"},STI={success:"check",warning:"bang",danger:"x"};
 const statusHTML=(k,t)=>`<span class="status c-${STC[k]}"><span class="si">${ic(STI[k])}</span>${t}</span>`;
@@ -1185,7 +1326,7 @@ function next(){const r=S.run;if(r.cap<=0)return end(false);if(r.i===5)return en
 function end(win){const r=S.run,daily=r.mode==="daily",cap=Math.max(0,r.cap),st=win?Math.max(1,starsOf(cap/r.start)):0;
   if(daily){S.daily={d:r.d,cap,st};S.streak={d:r.d,n:S.streak.d===r.d?S.streak.n:S.streak.d===yest()?S.streak.n+1:1}}
   else if(win){S.stars[r.l]=Math.max(S.stars[r.l]||0,st);if(r.l===S.max&&r.l<50)S.max=r.l+1}
-  S.run=null;save();shown=null;padOn=null;hap(win?H.win:H.lose);
+  S.run=null;S.ach.g++;save();shown=null;padOn=null;hap(win?H.win:H.lose);setTimeout(()=>medCheck(),1300);
   segs($("#gSegs"),6,"f");$("#jCible").classList.add("hide");$("#jSwitch").classList.add("hide");
   const title=daily?(win?"Défi relevé.":"Défi raté."):win?(r.l===50?"Tu as fini le jeu !":`Niveau ${r.l} réussi.`):"Capital épuisé.";
   const sub=daily?(win?`Série : ${S.streak.n} jour${S.streak.n>1?"s":""}. Nouveau défi demain.`:"Reviens demain pour un nouveau défi."):win?"Les étoiles dépendent du capital qu'il te reste.":"Retente : les questions seront différentes.";
@@ -1236,7 +1377,7 @@ function duelSubmit(){const v=parseBuf();if(!buf||isNaN(v)){replay($("#dBot .ans
    ${fact?`<div class="fact"><span class="eyebrow">Le saviez-vous ?</span>${esc(fact)}</div>`:""}`;
   $("#dBot").className="g-bot";$("#dBot").innerHTML=`<button class="btn" id="dNx">${last?"Voir le vainqueur":"Question suivante"}${ic("arrow")}</button>`;
   $("#dNx").onclick=()=>{hap(H.tap);if(last)duelEnd();else{D.i++;duelQ()}};eyesEl=null;fit($("#dMid"))}
-function duelEnd(){const[a,b]=D.cap,w=a===b?-1:a>b?0:1;hap(H.win);segs($("#dSegs"),6,"f");
+function duelEnd(){const[a,b]=D.cap,w=a===b?-1:a>b?0:1;hap(H.win);S.ach.du++;save();setTimeout(()=>medCheck(),1300);segs($("#dSegs"),6,"f");
   $("#dMid").innerHTML=`<div class="end"><h2 class="d-xl">${w<0?"Égalité !":`Joueur ${w+1} gagne !`}</h2>
    <div class="pl" style="margin-top:24px"><div class="c-bubble oc act" style="opacity:1"><span class="eyebrow">Joueur 1</span><div class="n-md">${fc(a)}</div></div>
    <div class="c-sky oc act" style="opacity:1"><span class="eyebrow">Joueur 2</span><div class="n-md">${fc(b)}</div></div></div></div>`;
@@ -1293,7 +1434,7 @@ async function oCreate(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ";let code="";
   for(let k=0;k<8&&!code;k++){const c=Array.from({length:4},()=>A[Math.random()*A.length|0]).join("");if(await fb(`rooms/${c}/state`)===null)code=c}
   if(!code)throw"Réessaie dans un instant.";
   await fb(`rooms/${code}`,"PUT",{m:"cap",v:300,state:"lobby",i:0,g:0,c:SV,players:{[ME]:{name:O0.name,s:0,j:SV,cap:0,tot:0,n:0}},hb:{[ME]:SV}});
-  closeSheet();oEnter(code)}
+  S.ach.cr++;save();closeSheet();oEnter(code);setTimeout(()=>medCheck(),900)}
 async function oJoin(code){code=String(code||"").toUpperCase().replace(/[^A-Z]/g,"");
   if(code.length!==4)throw"Le code salon fait 4 lettres.";
   const R=await fb(`rooms/${code}`);if(!R||!R.players)throw"Salon introuvable. Vérifie le code.";
@@ -1301,7 +1442,8 @@ async function oJoin(code){code=String(code||"").toUpperCase().replace(/[^A-Z]/g
   if(!P[ME]){if(R.state&&R.state!=="lobby")throw"La partie a déjà commencé dans ce salon.";
     if(Object.keys(P).length>=MAXP)throw"Salon complet : 4 joueurs maximum.";
     const used=Object.values(P).map(p=>p.s),s=[0,1,2,3].find(x=>!used.includes(x));
-    await fb(`rooms/${code}`,"PATCH",{[`players/${ME}`]:{name:O0.name,s,j:SV,cap:0,tot:0,n:0},[`hb/${ME}`]:SV})}
+    await fb(`rooms/${code}`,"PATCH",{[`players/${ME}`]:{name:O0.name,s,j:SV,cap:0,tot:0,n:0},[`hb/${ME}`]:SV});
+    S.ach.jo++;save();setTimeout(()=>medCheck(),900)}
   else if(P[ME].name!==O0.name)await fb(`rooms/${code}/players/${ME}/name`,"PUT",O0.name);
   closeSheet();oEnter(code)}
 function oResume(){if(!O0.name)return onlineSheet();toast("Connexion au salon "+O0.room+"…");
@@ -1439,6 +1581,7 @@ function oNext(){const R=O.R;if(O.adv===oKey())return;O.adv=oKey();
 
 /* Révélation */
 function vRev(){const R=O.R,P=R.players,i=R.i,q=qOf(i),cap=R.m==="cap";if(!q)return;padOn=null;
+  {const a=((R.ans||{})[i]||{})[ME];if(a&&a.v!=null&&medKey(S.ach.xk,`${O.code}|${R.g||0}|${i}`)){save();medExact(q,+a.v)}}
   const y=!!q[2],u=unitOf(q),k=catOf(q),c=CATS[k].c,fact=factOf(q),me=P[ME],L=me.last,host=hostId()===ME;
   const ids=oIds().filter(id=>P[id].last).sort((a,b)=>P[a].last.pen-P[b].last.pen);
   let t="La bonne réponse",stt="";
@@ -1458,6 +1601,7 @@ function vRev(){const R=O.R,P=R.players,i=R.i,q=qOf(i),cap=R.m==="cap";if(!q)ret
 function vEnd(){const R=O.R,P=R.players,cap=R.m==="cap",host=hostId()===ME;padOn=null;
   const sc=id=>cap?(+P[id].cap||0):-(+P[id].tot||0),ids=oIds().sort((a,b)=>sc(b)-sc(a)),best=sc(ids[0]),top=ids.filter(id=>sc(id)===best),tie=top.length>1;
   const title=tie?"Égalité !":top[0]===ME?"Tu as gagné !":`${esc(P[top[0]].name)} gagne !`;
+  if(!tie&&top[0]===ME&&medKey(S.ach.wk,`${O.code}|${R.g||0}`)){S.ach.ow++;save();setTimeout(()=>medCheck(),1300)}
   const score=id=>{const p=P[id];return cap?fc(Math.max(0,+p.cap||0))+NB+"pts":(p.n?Math.round(100-p.tot/p.n):0)+NB+"%"};
   $("#oMid").innerHTML=`<div class="end"><span class="eyebrow muted">${cap?`Survie · ${R.v} pts au départ`:`Précision · ${R.v} questions`}</span><h2 class="d-xl" style="margin-top:8px">${title}</h2>
    <div class="rk">${ids.map(id=>{const p=P[id],r=1+ids.filter(o=>sc(o)>sc(id)).length;
@@ -1472,7 +1616,9 @@ function vEnd(){const R=O.R,P=R.players,cap=R.m==="cap",host=hostId()===ME;padOn
   if(O.ek!==R.g){O.ek=R.g;const w=top.includes(ME);hap(w?H.win:H.lose)}
   eyesEl=null;fit($("#oMid"))}
 
-softSwap();S.run&&S.run.ph?show():tab("home");
+if(!S.ach.g&&(S.max>1||S.daily||S.hist.length||Object.keys(S.stars).length))S.ach.g=1;
+medCheck(true);
+softSwap();S.run&&S.run.ph?show():tab("home");medDot();
 </script>
 </body>
 </html>
