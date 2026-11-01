@@ -1008,6 +1008,7 @@ let lt=0;addEventListener("touchend",e=>{const n=Date.now();if(n-lt<350&&!e.targ
 /* Comportement d'application : pas de menu « Copier » ni de sélection au toucher long, sauf dans les champs de saisie */
 addEventListener("contextmenu",e=>{if(!e.target.closest("textarea,input"))e.preventDefault()});
 addEventListener("selectstart",e=>{if(!e.target.closest||!e.target.closest("textarea,input"))e.preventDefault()});
+["copy","cut","dragstart"].forEach(t=>addEventListener(t,e=>{if(!e.target.closest||!e.target.closest("textarea,input"))e.preventDefault()}));   // ni copier ni glisser le texte hors des champs de saisie
 function tab(t){curTab=t;eyesEl=null;D=null;
   $("#game").classList.add("hide");$("#duel").classList.add("hide");$("#online").classList.add("hide");const nv=$("#nav");if(nv.classList.contains("hide")){nv.classList.remove("hide");replay(nv,"in")}
   $$(".tab").forEach(e=>e.classList.add("hide"));const el=$("#t-"+t);el.classList.remove("hide");replay(el,"view");
