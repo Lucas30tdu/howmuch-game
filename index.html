@@ -38,6 +38,18 @@
   --surface:#121212;--raised:#1F1F1F;--sunken:#2B2B2B;--ink:#F6F0E8;--muted:#B5ADA3;--line:#383838;
   --action:#F6F0E8;--on-action:#171717;--focus:#8EAAFF;--sheet:0 -6px 24px rgba(0,0,0,.5);--scrim:rgba(0,0,0,.6);color-scheme:dark}
 
+
+/* mascotte qui jette un œil derrière la carte de jeu */
+.peekWrap{position:relative;isolation:isolate}
+.peekWrap .play{position:relative;z-index:1}
+.hd.grow{position:relative;z-index:2}
+.peek{position:absolute;top:0;left:50%;width:96px;height:160px;z-index:0;pointer-events:none;transform:translate(-50%,8px);animation:peekUp 10s ease-in-out 2s infinite}
+.peek svg{display:block;width:100%;height:100%;animation:peekTilt 10s ease-in-out 2s infinite;transform-origin:50% 100%}
+.peek .pp{transform-box:view-box;transform-origin:0 0;animation:peekEyes 10s linear 2s infinite}
+@keyframes peekUp{0%{transform:translate(-50%,8px)}8%{transform:translate(-50%,-112px)}11%{transform:translate(-50%,-100px)}33%{transform:translate(-50%,-104px)}37%{transform:translate(-50%,-116px)}44%,100%{transform:translate(-50%,8px)}}
+@keyframes peekTilt{0%,10%{transform:rotate(0)}16%{transform:rotate(-8deg)}22%{transform:rotate(7deg)}28%{transform:rotate(-3deg)}33%,100%{transform:rotate(0)}}
+@keyframes peekEyes{0%,10%{transform:rotate(0)}20%{transform:rotate(360deg)}24%{transform:rotate(540deg)}30%{transform:rotate(900deg)}34%,37%{transform:rotate(990deg)}42%,100%{transform:rotate(1080deg)}}
+@media (max-height:700px){.peek{width:80px;height:134px}@keyframes peekUp{0%{transform:translate(-50%,8px)}8%{transform:translate(-50%,-92px)}11%{transform:translate(-50%,-82px)}33%{transform:translate(-50%,-86px)}37%{transform:translate(-50%,-96px)}44%,100%{transform:translate(-50%,8px)}}}
 /* ===== BASE ===== */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 img,svg{-webkit-user-drag:none}
@@ -442,7 +454,7 @@ textarea:focus{border-color:var(--ink)}
     <span class="chip coin" id="starChip" aria-label="Étoiles gagnées"></span>
   </div>
   <div class="hd grow"><span class="eyebrow muted" id="today"></span><h1 class="d-xl" id="hello"></h1></div>
-  <button class="play c-tomato oc" id="playCard"></button>
+  <div class="peekWrap"><div class="peek" aria-hidden="true"><svg viewBox="0 0 96 160" aria-hidden="true"><path d="M14 70Q14 56 28 56H68Q82 56 82 70V160H14Z" fill="#FF9AD5"/><circle cx="48" cy="46" r="40" fill="#FF9AD5"/><g transform="translate(33 40)"><circle r="11.5" fill="#FFF8F0"/><g class="pp"><circle cx="4.8" r="5.8" fill="#171717"/></g></g><g transform="translate(63 40)"><circle r="11.5" fill="#FFF8F0"/><g class="pp"><circle cx="4.8" r="5.8" fill="#171717"/></g></g></svg></div><button class="play c-tomato oc" id="playCard"></button></div>
   <div class="tiles">
     <button class="tile c-butter oc" id="dailyCard"></button>
     <button class="tile c-sky oc" id="duelCard"></button>
