@@ -782,7 +782,9 @@ function musSync(){const w=musWant();
     const v=a.volume;a.volume=Math.abs(v-t)>.01?Math.max(0,Math.min(1,v+(t-v)*.2)):t;
     if(t===0&&a.volume<=.02&&!a.paused&&!a._p)a.pause()}}
 setInterval(musSync,120);
-["pointerdown","keydown","touchend"].forEach(e=>addEventListener(e,musSync,{passive:true}));
+/* Les navigateurs interdisent tout son avant un geste : on tente dès le chargement, puis à chaque type de geste reconnu (capture) jusqu'au démarrage effectif */
+["pointerdown","pointerup","touchstart","touchend","mousedown","click","keydown"].forEach(e=>addEventListener(e,musSync,{passive:true,capture:true}));
+addEventListener("pageshow",musSync);addEventListener("load",musSync);
 document.addEventListener("visibilitychange",musSync);
 
 /* ===== VIBRATIONS ===== */
