@@ -40,3 +40,7 @@ L'icône reprend la charte : fond jaune *butter*, la bulle rose du logo qui lèv
 - `manifest.webmanifest` : nom, couleurs et icônes de l'application installée
 
 Pour installer le jeu comme une appli : sur iPhone, bouton Partager puis « Sur l'écran d'accueil » ; sur Android, menu ⋮ puis « Installer l'application ».
+
+## Musique
+
+Le thème « HowMuch? Lobby » (`audio/lobby.mp3`) joue en boucle dans les menus et le salon d'attente en ligne, et se coupe pendant les parties. Une coche **Musique** dans les Réglages permet de la désactiver (le navigateur exige un premier toucher avant de lancer le son).
