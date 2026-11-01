@@ -781,19 +781,24 @@ function musWant(){if(!S.mus||document.hidden)return null;
   if(vis("game")||vis("duel"))return"focus";
   if(vis("online"))return(typeof O!=="undefined"&&O&&O.R&&(O.R.state||"lobby")!=="lobby")?"focus":"lobby";
   return"lobby"}
-function musInit(){const a=acx();if(!a||MG.ok||MG.fail)return;
-  try{for(const k in TR){const g=a.createGain();g.gain.value=0;a.createMediaElementSource(TR[k]).connect(g).connect(a.destination);MG[k]=g;MG["t"+k]=0}MG.ok=1}catch(e){MG.fail=1}}
-function musSync(){const w=musWant(),on=!!S.mus&&!document.hidden;if(on)musInit();
+function musInit(){if(!AC||MG.ok||MG.fail)return;
+  try{for(const k in TR){const g=AC.createGain();g.gain.value=0;AC.createMediaElementSource(TR[k]).connect(g).connect(AC.destination);MG[k]=g;MG["t"+k]=null}MG.ok=1}catch(e){MG.fail=1}}
+function musSync(){const w=musWant(),on=!!S.mus&&!document.hidden&&!!AC;if(on)musInit();
   for(const k in TR){const a=TR[k],t=k===w?MVOL[k]:0;
     if(on&&a.paused&&!a._p){a._p=1;a.play().catch(()=>{}).then(()=>{a._p=0})}
-    if(MG.ok){if(MG["t"+k]!==t){MG["t"+k]=t;MG[k].gain.setTargetAtTime(t,AC.currentTime,.3)}}
-    else{const v=a.volume;a.volume=Math.abs(v-t)>.01?Math.max(0,Math.min(1,v+(t-v)*.2)):t}
+    if(MG.ok){if(AC.state==="running"&&MG["t"+k]!==t){MG["t"+k]=t;MG[k].gain.setTargetAtTime(t,AC.currentTime,.3)}}
+    else if(AC){const v=a.volume;a.volume=Math.abs(v-t)>.01?Math.max(0,Math.min(1,v+(t-v)*.2)):t}
     if(!on&&!a.paused&&!a._p&&(MG.ok||a.volume<=.02))a.pause()}}
+/* Déblocage iOS : le contexte audio doit être créé ET repris pendant un geste « activant » (touchend, clic, touche ; pas touchstart),
+   sinon la lecture démarre (icône dans la Dynamic Island) mais reste muette jusqu'au geste suivant. */
+function unlockAudio(){if(!S.mus&&!S.sfx)return;const a=acx();if(!a)return;
+  const go=()=>{for(const k in TR)MG["t"+k]=null;musSync()};
+  if(a.state!=="running"){try{a.resume().then(go).catch(()=>{})}catch(e){}}
+  try{const b=a.createBuffer(1,1,22050),n=a.createBufferSource();n.buffer=b;n.connect(a.destination);n.start(0)}catch(e){}
+  musSync()}
 setInterval(musSync,120);
-/* Les navigateurs interdisent tout son avant un geste : on tente dès le chargement, puis à chaque type de geste reconnu (capture) jusqu'au démarrage effectif */
-["pointerdown","pointerup","touchstart","touchend","mousedown","click","keydown"].forEach(e=>addEventListener(e,musSync,{passive:true,capture:true}));
-addEventListener("pageshow",musSync);addEventListener("load",musSync);
-document.addEventListener("visibilitychange",musSync);
+["touchend","pointerup","mousedown","click","keydown"].forEach(e=>addEventListener(e,unlockAudio,{passive:true,capture:true}));
+addEventListener("pageshow",musSync);document.addEventListener("visibilitychange",()=>{if(AC&&AC.state!=="running"&&!document.hidden)try{AC.resume()}catch(e){}musSync()});
 
 /* Chaque motif porte le nom de son bruitage (.s) : un seul appel hap() donne la vibration et le son */
 const tg=(a,n)=>(a.s=n,a);
@@ -806,7 +811,7 @@ const H={tap:tg([8],"tap"),ok:tg([14],"ok"),good:tg([12,50,12],"perfect"),win:tg
 /* ===== BRUITAGES : synthétisés en Web Audio (aucun fichier), timbres ronds façon marimba et verre, volume discret ===== */
 let AC=null,SG=null,starN=0,starT=0;
 function acx(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();
-    SG=AC.createGain();SG.gain.value=.34;const lp=AC.createBiquadFilter();lp.type="lowpass";lp.frequency.value=5200;SG.connect(lp).connect(AC.destination)}
+    AC.onstatechange=()=>{if(AC.state==="running"){for(const k in TR)MG["t"+k]=null;musSync()}};SG=AC.createGain();SG.gain.value=.34;const lp=AC.createBiquadFilter();lp.type="lowpass";lp.frequency.value=5200;SG.connect(lp).connect(AC.destination)}
   if(AC.state==="suspended")AC.resume();return AC}
 ["pointerdown","touchend","keydown"].forEach(e=>addEventListener(e,()=>{if(S&&S.sfx)acx()},{passive:true,once:true}));
 const NT=n=>440*Math.pow(2,(n-69)/12);   // note MIDI → Hz
@@ -1021,7 +1026,7 @@ function renderSet(){
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.9</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.10</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};
