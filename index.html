@@ -742,6 +742,7 @@ const I={
  phone:'<rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M11 18h2"/>',book:'<path d="M5 4h10a4 4 0 014 4v12H9a4 4 0 01-4-4z"/><path d="M5 16a4 4 0 014-4h10"/>',
  vib:'<rect x="8" y="4" width="8" height="16" rx="2"/><path d="M4 9v6M20 9v6"/>',moon:'<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>',
  dl:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',chev:'<path d="M9 6l6 6-6 6"/>',pm:'<path d="M5 12h6M8 9v6M14 15l5-6"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+ spk:'<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9.5a3.5 3.5 0 010 5M18 7a7 7 0 010 10"/>',
  note:'<path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2.5"/><circle cx="17" cy="16" r="2.5"/>',
  clock:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2.5h4"/>',share:'<path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v8h14v-8"/>'
 };
@@ -787,13 +788,51 @@ document.addEventListener("visibilitychange",musSync);
 /* ===== VIBRATIONS ===== */
 const hl=document.createElement("label");hl.style.cssText="position:fixed;left:-99px;top:0;opacity:0";hl.setAttribute("aria-hidden","true");
 hl.innerHTML='<input type="checkbox" switch tabindex="-1">';document.body.appendChild(hl);
-function hap(p){if(!S.hap)return;p=[].concat(p);if(navigator.vibrate){navigator.vibrate(p);return}
+/* Chaque motif porte le nom de son bruitage (.s) : un seul appel hap() donne la vibration et le son */
+const tg=(a,n)=>(a.s=n,a);
+function hap(p){if(p&&p.s)sfx(p.s);if(!S.hap)return;p=[].concat(p);if(navigator.vibrate){navigator.vibrate(p);return}
   let t=0;p.forEach((d,i)=>{if(i%2===0)setTimeout(()=>hl.click(),t);t+=d})}
-const H={tap:[8],ok:[14],good:[12,50,12],win:[12,40,12,40,40],lose:[70,60,70,60,140],joker:[10,30,18],star:[10],
-  loss:p=>p<10?[16]:p<40?[24,50,24]:[40,50,40,50,70]};
+const H={tap:tg([8],"tap"),ok:tg([14],"ok"),good:tg([12,50,12],"perfect"),win:tg([12,40,12,40,40],"win"),lose:tg([70,60,70,60,140],"lose"),joker:tg([10,30,18],"joker"),star:tg([10],"star"),
+  err:tg([30,40,30],"err"),tick:tg([6],"tick"),
+  loss:p=>p<10?tg([16],"near"):p<40?tg([24,50,24],"mid"):tg([40,50,40,50,70],"far")};
+
+/* ===== BRUITAGES : synthétisés en Web Audio (aucun fichier), timbres ronds façon marimba et verre, volume discret ===== */
+let AC=null,SG=null,starN=0,starT=0;
+function acx(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();
+    SG=AC.createGain();SG.gain.value=.34;const lp=AC.createBiquadFilter();lp.type="lowpass";lp.frequency.value=5200;SG.connect(lp).connect(AC.destination)}
+  if(AC.state==="suspended")AC.resume();return AC}
+["pointerdown","touchend","keydown"].forEach(e=>addEventListener(e,()=>{if(S&&S.sfx)acx()},{passive:true,once:true}));
+const NT=n=>440*Math.pow(2,(n-69)/12);   // note MIDI → Hz
+/* Une note : fondamentale + partiel brillant qui s'éteint vite (attaque marimba) */
+function tone(f,t,{d=.35,v=.5,type="sine",bright=.25,to=0}={}){const a=AC,o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+d*.8);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0008,t+d);
+  o.connect(g).connect(SG);o.start(t);o.stop(t+d+.05);
+  if(bright){const o2=a.createOscillator(),g2=a.createGain();o2.frequency.value=f*4;g2.gain.setValueAtTime(v*bright,t);g2.gain.exponentialRampToValueAtTime(.0005,t+Math.min(.09,d));
+    o2.connect(g2).connect(SG);o2.start(t);o2.stop(t+.12)}}
+/* Souffle filtré très court : « pop » des boutons */
+function puff(t,{f=1800,d=.03,v=.18}={}){const a=AC,n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);
+  for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+  const s=a.createBufferSource(),bp=a.createBiquadFilter(),g=a.createGain();s.buffer=b;bp.type="bandpass";bp.frequency.value=f;bp.Q.value=1.2;g.gain.value=v;
+  s.connect(bp).connect(g).connect(SG);s.start(t)}
+const SFX={
+  tap:t=>{tone(NT(84),t,{d:.06,v:.22,bright:0,to:NT(79)});puff(t,{f:2400,v:.08})},                  // bouton : petit pop doux
+  ok:t=>{tone(NT(79),t,{d:.12,v:.26});tone(NT(86),t+.055,{d:.18,v:.22})},                            // validation : deux notes qui montent
+  tick:t=>tone(NT(91),t,{d:.05,v:.12,bright:0}),                                                       // compte à rebours en ligne
+  err:t=>{tone(NT(52),t,{d:.12,v:.3,type:"triangle",bright:0});tone(NT(50),t+.09,{d:.16,v:.26,type:"triangle",bright:0})},  // saisie refusée : « bonk » sourd
+  near:t=>{tone(NT(79),t,{d:.22,v:.3});tone(NT(84),t+.08,{d:.35,v:.3})},                               // bonne réponse (< 10 pts)
+  mid:t=>{tone(NT(76),t,{d:.3,v:.28});tone(NT(74),t+.1,{d:.3,v:.2,bright:.1})},                        // réponse moyenne : neutre
+  far:t=>{tone(NT(69),t,{d:.25,v:.26,type:"triangle",bright:0});tone(NT(64),t+.12,{d:.4,v:.24,type:"triangle",bright:0,to:NT(62)})},   // loin : glisse vers le bas
+  perfect:t=>{[72,76,79,84].forEach((n,i)=>tone(NT(n+12),t+i*.06,{d:.5,v:.24}));tone(NT(108),t+.26,{d:.6,v:.06,bright:0})},   // « Dans le mille » : arpège + éclat
+  joker:t=>{[88,91,96].forEach((n,i)=>tone(NT(n),t+i*.045,{d:.25,v:.13,bright:.1}));puff(t,{f:6000,d:.12,v:.05})},          // joker : scintillement
+  star:t=>{const k=performance.now()-starT<900?++starN:(starN=0);starT=performance.now();tone(NT([84,88,91][Math.min(k,2)]),t,{d:.7,v:.2,bright:.4})},  // étoiles : verre, une note de plus par étoile
+  win:t=>{[60,64,67,72].forEach((n,i)=>tone(NT(n+12),t+i*.09,{d:.45,v:.22}));[72,76,79].forEach(n=>tone(NT(n+12),t+.4,{d:1.1,v:.11,bright:.1}))},  // niveau gagné : arpège + accord tenu
+  lose:t=>{[67,63,60].forEach((n,i)=>tone(NT(n),t+i*.16,{d:.45,v:.22,type:"triangle",bright:0}));tone(NT(55),t+.5,{d:.8,v:.14,type:"triangle",bright:0,to:NT(53)})}  // perdu : descente mineure, feutrée
+};
+function sfx(n){if(!S||!S.sfx||document.hidden||!SFX[n])return;const a=acx();if(!a)return;try{SFX[n](a.currentTime+.005)}catch(e){}}
 
 /* ===== ÉTAT & SAUVEGARDE ===== */
-const DEF=()=>({v:7,seen:[],max:1,run:null,hap:true,mus:true,theme:"auto",stars:{},hist:[],cat:{},daily:null,streak:{d:"",n:0}});
+const DEF=()=>({v:7,seen:[],max:1,run:null,hap:true,mus:true,sfx:true,theme:"auto",stars:{},hist:[],cat:{},daily:null,streak:{d:"",n:0}});
 let S;try{const p=JSON.parse(localStorage.getItem(KEY))||{};if(p.v!==7){p.run=null;p.seen=[]}S=Object.assign(DEF(),p,{v:7})}catch(e){S=DEF()}   // v7 : base enrichie, index des questions renumérotés
 S.cat=Object.fromEntries(Object.entries(S.cat||{}).filter(([k])=>CATS[k]));   // anciennes catégories ignorées
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
@@ -926,7 +965,7 @@ function renderLevels(){
   replay(hero,"tierHero");$("#lvGrid").innerHTML=h;
   $$("#tierBar button").forEach(b=>b.onclick=()=>{hap(H.tap);tierSel=+b.dataset.t;renderLevels()});
   $$(".lvb").forEach(b=>b.onclick=()=>{const l=+b.dataset.l;
-    if(l>S.max){hap([30,40,30]);replay(b,"shake");toast(`Termine le niveau ${S.max} pour avancer`);return}
+    if(l>S.max){hap(H.err);replay(b,"shake");toast(`Termine le niveau ${S.max} pour avancer`);return}
     hap(H.ok);if(S.run&&S.run.mode!=="daily"&&S.run.l===l)return show();startLevel(l)});
   stagger($("#lvGrid"))}
 /* Glisser à gauche ou à droite pour changer de palier */
@@ -959,6 +998,7 @@ function renderSet(){
   const nq=CUS.length;
   $("#setList").innerHTML=`
    <button class="row" id="sHap"><span class="ri c-butter">${ic("vib")}</span><span class="rt"><b>Vibrations</b><small>Retours haptiques</small></span><span class="sw ${S.hap?"on":""}" role="switch" aria-checked="${S.hap}"><i></i></span></button>
+   <button class="row" id="sSfx"><span class="ri c-olive">${ic("spk")}</span><span class="rt"><b>Bruitages</b><small>Boutons, réponses, étoiles</small></span><span class="sw ${S.sfx?"on":""}" role="switch" aria-checked="${S.sfx}"><i></i></span></button>
    <button class="row" id="sMus"><span class="ri c-bubble">${ic("note")}</span><span class="rt"><b>Musique</b><small>Ambiance des menus et des parties</small></span><span class="sw ${S.mus?"on":""}" role="switch" aria-checked="${S.mus}"><i></i></span></button>
    <div class="row"><span class="ri c-sky">${ic("moon")}</span><span class="rt"><b>Thème</b></span><span class="seg" role="radiogroup" aria-label="Thème">${[["auto","Auto"],["light","Clair"],["dark","Sombre"]].map(([k,l])=>`<button role="radio" aria-checked="${S.theme===k}" class="${S.theme===k?"on":""}" data-th="${k}">${l}</button>`).join("")}</span></div>
    <button class="row" id="sRules"><span class="ri c-tomato">${ic("book")}</span><span class="rt"><b>Règles du jeu</b><small>Capital, étoiles, jokers, défi</small></span><span class="go">${ic("chev")}</span></button>
@@ -966,17 +1006,18 @@ function renderSet(){
    ${standalone?"":`<button class="row" id="sInst"><span class="ri c-bubble">${ic("dl")}</span><span class="rt"><b>Installer l'application</b><small>Sur l'écran d'accueil, en plein écran</small></span><span class="go">${ic("chev")}</span></button>`}
    <button class="row" id="sAbout"><span class="ri c-electric">${ic("info")}</span><span class="rt"><b>À propos</b><small>Version, créateur</small></span><span class="go">${ic("chev")}</span></button>
    <button class="row danger" id="sReset">Réinitialiser la progression</button>`;
+  $("#sSfx").onclick=()=>{S.sfx=!S.sfx;save();renderSet();hap(H.ok)};
   $("#sMus").onclick=()=>{S.mus=!S.mus;save();renderSet();hap(H.ok);musSync()};
   $("#sHap").onclick=()=>{S.hap=!S.hap;save();renderSet();hap(H.ok)};
   $$("[data-th]").forEach(b=>b.onclick=()=>{hap(H.tap);S.theme=b.dataset.th;save();applyTheme();renderSet()});
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.5</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.6</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};
-  $("#sReset").onclick=()=>{hap(H.tap);ask("Tout effacer ?","Niveaux débloqués, étoiles, statistiques, série et défi du jour seront remis à zéro. Tes questions ajoutées sont conservées.","Tout effacer",()=>{const h=S.hap,t=S.theme,m=S.mus;S=DEF();S.hap=h;S.theme=t;S.mus=m;tierSel=null;save();tab("home");toast("Progression réinitialisée")})};
+  $("#sReset").onclick=()=>{hap(H.tap);ask("Tout effacer ?","Niveaux débloqués, étoiles, statistiques, série et défi du jour seront remis à zéro. Tes questions ajoutées sont conservées.","Tout effacer",()=>{const h=S.hap,t=S.theme,m=S.mus,x=S.sfx;S=DEF();S.hap=h;S.theme=t;S.mus=m;S.sfx=x;tierSel=null;save();tab("home");toast("Progression réinitialisée")})};
 }
 /* Import d'une base { level, question, answer } collée telle quelle (sans eval) */
 function parseDB(t){const out=[],re=/\{[^{}]*\}/g;let m;
@@ -992,7 +1033,7 @@ function importSheet(){hap(H.ok);
    `<button class="btn" id="impGo">Ajouter</button>${CUS.length?`<button class="btn btn-out" id="impNo">Supprimer mes ${CUS.length} questions</button>`:""}<button class="btn btn-out" data-close>Fermer</button>`);
   const msg=(t,e)=>{const m=$("#impM");m.textContent=t;m.style.color=e?"var(--tomato)":"var(--ink)"};
   $("#impGo").onclick=()=>{const o=parseDB($("#impT").value);
-    if(!o.length){msg("Aucune question trouvée.",1);hap([30,40,30]);return}
+    if(!o.length){msg("Aucune question trouvée.",1);hap(H.err);return}
     const have=new Set([...BASE,...CUS].map(x=>norm(x[0]))),nu=[];let dup=0,bad=0;
     o.forEach(x=>{if(!(x.l>=1&&x.l<=50)){bad++;return}const k=norm(x.t);if(have.has(k)){dup++;return}have.add(k);
       nu.push([x.t,x.a,/^(Année|En quelle année|Premier prix Nobel)/i.test(x.t)?1:0,x.l])});
@@ -1086,7 +1127,7 @@ function setCap(v,anim=true){const r=S.run,from=shown==null?v:shown;shown=v;
   if(anim){const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);el.innerHTML=fc(from+(v-from)*e)+suf;if(k<1)requestAnimationFrame(f)})(t0)}
   else el.innerHTML=fc(v)+suf}
 function submit(){const r=S.run,q=Q[r.qs[r.i]],v=parseBuf();
-  if(!buf||isNaN(v)){replay($(".ans-l"),"shake");hap([30,40,30]);toast("Tape ta réponse sur le pavé");return}
+  if(!buf||isNaN(v)){replay($(".ans-l"),"shake");hap(H.err);toast("Tape ta réponse sur le pavé");return}
   padOn=null;const pen=penOf(q,v);r.fb={v,gap:Math.abs(q[1]-v),pen};r.cap=r1(r.cap-pen);r.ph="f";record(q,pen);save();feedback(true)}
 function verdict(p){return p===0?["Dans le mille.","success","Parfait"]:p<10?["Bien vu !","success",`−${fmt(p)} pts`]:p<35?["Pas mal du tout.","warning",`−${fmt(p)} pts`]:p<70?["Un peu loin.","warning",`−${fmt(p)} pts`]:["Trop loin, cette fois.","danger",`−${fmt(p)} pts`]}
 const STC={success:"electric",warning:"butter",danger:"tomato"},STI={success:"check",warning:"bang",danger:"x"};
@@ -1151,7 +1192,7 @@ function duelTurn(){const q=Q[D.qs[D.i]];buf="";isYear=!!q[2];
   $("#dBot").className="g-bot withpad";
   $("#dBot").innerHTML=ansHTML(q,`À toi, Joueur ${D.t+1}`)+padHTML()+`<button class="btn btn-badge" id="dOk"><span class="bdg">${ic("check","i i-sm")}</span>${D.t?"Valider et révéler":"Valider, au tour du Joueur 2"}<span class="arr">${ic("arrow")}</span></button>`;
   bindPad($("#dBot"));$("#dOk").onclick=duelSubmit;padOn=duelSubmit;renderAns();watchEyes($("#dMid"));$("#dMid").scrollTop=0}
-function duelSubmit(){const v=parseBuf();if(!buf||isNaN(v)){replay($("#dBot .ans-l"),"shake");hap([30,40,30]);toast("Tape ta réponse sur le pavé");return}
+function duelSubmit(){const v=parseBuf();if(!buf||isNaN(v)){replay($("#dBot .ans-l"),"shake");hap(H.err);toast("Tape ta réponse sur le pavé");return}
   D.ans[D.t]=v;hap(H.ok);if(D.t===0){D.t=1;toast("Passe le téléphone au Joueur 2");return duelTurn()}
   padOn=null;const q=Q[D.qs[D.i]],y=!!q[2],pens=D.ans.map(a=>penOf(q,a)),old=D.cap.slice(),u=unitOf(q),c=CATS[catOf(q)].c,fact=factOf(q);
   D.cap=D.cap.map((x,k)=>r1(x-pens[k]));$("#dP0").classList.add("act");$("#dP1").classList.add("act");
@@ -1206,14 +1247,14 @@ function onlineSheet(m){
    <div class="msg" id="oMsg" role="status"></div>`,'<button class="btn btn-out" data-close>Annuler</button>');
   const msg=t=>{const e=$("#oMsg");e.textContent=t;e.style.color="var(--tomato)"};if(m)msg(m);
   const nm=()=>{const v=$("#oName").value.trim().replace(/\s+/g," ").slice(0,14);
-    if(!v){msg("Ajoute ton prénom pour que les autres te reconnaissent.");replay($("#oName"),"shake");hap([30,40,30]);return null}
+    if(!v){msg("Ajoute ton prénom pour que les autres te reconnaissent.");replay($("#oName"),"shake");hap(H.err);return null}
     O0.name=v;saveO();return v};
   const busy=on=>$$("#sheet .btn").forEach(x=>x.disabled=on);
   const err=e=>typeof e==="string"?e:"Connexion impossible au serveur. Vérifie ta connexion.";
   $("#oNew").onclick=async()=>{if(!nm())return;hap(H.ok);const b=$("#oNew");busy(true);b.textContent="Création du salon…";
     try{await oCreate()}catch(e){busy(false);b.textContent="Créer un salon";msg(err(e))}};
   $("#oJoin").onclick=async()=>{if(!nm())return;hap(H.ok);const b=$("#oJoin");busy(true);b.textContent="…";
-    try{await oJoin($("#oCode").value)}catch(e){busy(false);b.textContent="Rejoindre";msg(err(e));hap([30,40,30])}};
+    try{await oJoin($("#oCode").value)}catch(e){busy(false);b.textContent="Rejoindre";msg(err(e));hap(H.err)}};
   $("#oCode").oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,4)};
   $("#oCode").onkeydown=e=>{if(e.key==="Enter")$("#oJoin").click()}}
 async function oCreate(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ";let code="";
@@ -1330,7 +1371,7 @@ function vQ(){const R=O.R,me=R.players[ME],q=qOf(R.i),cap=R.m==="cap";if(!q)retu
     bindPad(B);$("#oOk").onclick=()=>oSubmit();padOn=oSubmit;renderAns()}
   watchEyes($("#oMid"))}
 function oSubmit(){const R=O.R,v=parseBuf();
-  if(!buf||isNaN(v)){replay($("#oBot .ans-l"),"shake");hap([30,40,30]);toast("Tape ta réponse sur le pavé");return}
+  if(!buf||isNaN(v)){replay($("#oBot .ans-l"),"shake");hap(H.err);toast("Tape ta réponse sur le pavé");return}
   const f=oFirst();if(f&&now()>f+TLIM){toast("Trop tard !");return}
   const i=R.i;padOn=null;hap(H.ok);
   O.R=setAt(O.R,`ans/${i}/${ME}`,{v,t:Math.round(now())});oRender();
@@ -1342,7 +1383,7 @@ function oTick(){if(!O||!O.R||!O.R.players||!O.R.players[ME])return;const R=O.R,
     if(f){const rem=Math.max(0,Math.ceil((f+TLIM-t)/1000));tm.classList.remove("hide");tm.classList.toggle("hot",rem<=5);
       tm.innerHTML=ic("clock","i i-sm")+rem+NB+"s";tm.setAttribute("aria-label",rem+" secondes restantes");
       if(O.fs!==oKey()){O.fs=oKey();if(!mine&&act){hap(H.joker);toast("Chrono lancé : 15 secondes !")}}
-      if(!mine&&act&&rem!==O.ls&&rem<=5&&rem>0)hap([6]);O.ls=rem}
+      if(!mine&&act&&rem!==O.ls&&rem<=5&&rem>0)hap(H.tick);O.ls=rem}
     else tm.classList.add("hide");
     if(host&&O.rv!==oKey()){const ids=oIds(),need=ids.filter(id=>R.m!=="cap"||R.players[id].cap>0);
       if((need.length&&need.every(id=>a[id]))||(f&&t>f+TLIM+400))oReveal()}}
