@@ -302,6 +302,7 @@ h1,h2,h3,p{margin:0}
 .bigstars .star:nth-child(2){animation-delay:.18s}.bigstars .star:nth-child(3){animation-delay:.36s}
 .endc{position:relative;display:flex;flex-direction:column;gap:10px;padding:22px;border-radius:var(--r-lg);overflow:hidden}
 .endc .art{position:absolute;right:-10px;bottom:-14px;width:120px;height:120px}
+@media (max-height:700px){.end{padding-top:0}.end .d-xl{font-size:30px}.bigstars{margin:12px 0 14px}.bigstars .star{width:44px;height:44px}.endc{padding:16px;gap:6px}.endc .n-xl{font-size:44px;line-height:1}.endc .art{width:84px;height:84px}.g-bot .btn+.btn{margin-top:8px}}
 
 /* Duel */
 .pl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
@@ -1334,8 +1335,9 @@ function end(win){const r=S.run,daily=r.mode==="daily",cap=Math.max(0,r.cap),st=
   $("#gMid").innerHTML=`<div class="end"><h2 class="d-xl">${title}</h2><div class="bigstars">${[0,1,2].map(i=>star(i<st)).join("")}</div>
    <div class="endc c-${c} oc">${art(win?(daily?"dates":"vitesse"):"quantites")}<span class="eyebrow">Capital restant</span><div class="n-xl">${fc(cap)}</div><div class="cap" style="max-width:60%">${sub}</div></div></div>`;
   $$("#gMid .bigstars .star.on").forEach((s,i)=>setTimeout(()=>hap(H.star),300+i*180));
-  $("#gBot").className="g-bot";$("#gBot").innerHTML=(daily?"":`<button class="btn" id="gAgain">${win&&r.l<50?"Niveau "+S.max:"Rejouer le niveau "+r.l}${ic("arrow")}</button>`)+`<button class="btn btn-out" id="gMenu">Accueil</button>`;
+  $("#gBot").className="g-bot";$("#gBot").innerHTML=(daily?"":`<button class="btn" id="gAgain">${win&&r.l<50?"Niveau "+S.max:"Rejouer le niveau "+r.l}${ic("arrow")}</button>`)+(!daily&&win&&r.l<50&&cap<r.start?`<button class="btn btn-out" id="gRe">Rejouer le niveau ${r.l}</button>`:"")+`<button class="btn btn-out" id="gMenu">Accueil</button>`;   // niveau gagné sans le capital complet : on peut le rejouer
   if($("#gAgain"))$("#gAgain").onclick=()=>{hap(H.ok);startLevel(win&&r.l<50?S.max:r.l)};
+  if($("#gRe"))$("#gRe").onclick=()=>{hap(H.ok);startLevel(r.l)};
   $("#gMenu").onclick=()=>{hap(H.tap);tab("home")};watchEyes($("#gMid"))}
 /* Jokers */
 $("#jSwitch").onclick=()=>{const r=S.run;if(!r||!r.sw||r.ph!=="q")return;let c=LV[r.l].filter(i=>!r.qs.includes(i));
