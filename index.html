@@ -913,7 +913,7 @@ function rules(){const L=[["tomato","50 niveaux de 6 questions. Chaque réponse 
 
 /* ===== NAVIGATION ===== */
 const NAV={home:["home","Accueil"],levels:["levels","Niveaux"],stats:["stats","Précision"],set:["gear","Réglages"]};
-$$("#nav button").forEach(b=>{const[k,l]=NAV[b.dataset.t];b.innerHTML=ic(k)+`<span>${l}</span>`;b.setAttribute("aria-label",l);b.onclick=()=>{hap(H.tap);tab(b.dataset.t)}});
+$$("#nav button").forEach(b=>{const[k,l]=NAV[b.dataset.t];b.innerHTML=ic(k)+`<span>${l}</span>`;b.setAttribute("aria-label",l);b.onclick=()=>{hap(H.tap);if(b.dataset.t===curTab&&$("#game").classList.contains("hide")&&$("#duel").classList.contains("hide")&&$("#online").classList.contains("hide")){scrollTo({top:0,behavior:"smooth"});return}tab(b.dataset.t)}});
 let curTab="home";
 /* Comportement d'application : pas de menu « Copier » ni de sélection au toucher long, sauf dans les champs de saisie */
 addEventListener("contextmenu",e=>{if(!e.target.closest("textarea,input"))e.preventDefault()});
@@ -1026,7 +1026,7 @@ function renderSet(){
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.10</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.11</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};
