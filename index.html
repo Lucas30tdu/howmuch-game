@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#F6F0E8" id="tc">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -41,6 +41,7 @@
 /* ===== BASE ===== */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 img,svg{-webkit-user-drag:none}
+*{touch-action:pan-x pan-y}   /* pas de zoom au pincement ni au double toucher */
 textarea,input{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 html,body{margin:0;background:var(--surface);color:var(--ink);font:400 17px/24px var(--f-t);-webkit-font-smoothing:antialiased;overscroll-behavior:none;height:100%;overflow:hidden}
 body{position:fixed;inset:0;height:100dvh}
@@ -419,7 +420,7 @@ h1,h2,h3,p{margin:0}
 .rules li b{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;font:900 14px/1 var(--f-n);color:var(--on-color)}
 .dg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .dg button{display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:104px;padding:16px;border-radius:var(--r-md);text-align:left;color:var(--on-color)}
-textarea{width:100%;padding:14px;border-radius:16px;border:2px solid var(--line);background:var(--raised);color:var(--ink);font:13px/1.35 ui-monospace,Menlo,monospace;outline:0;resize:vertical}
+textarea{width:100%;padding:14px;border-radius:16px;border:2px solid var(--line);background:var(--raised);color:var(--ink);font:16px/1.35 ui-monospace,Menlo,monospace;outline:0;resize:vertical}
 textarea:focus{border-color:var(--ink)}
 .msg{margin-top:10px;font-weight:600;font-size:15px}
 
@@ -999,6 +1000,11 @@ function rules(){const L=[["tomato","50 niveaux de 6 questions. Chaque réponse 
 const NAV={home:["home","Accueil"],levels:["levels","Niveaux"],stats:["stats","Précision"],med:["medal","Médailles"],set:["gear","Réglages"]};
 $$("#nav button").forEach(b=>{const[k,l]=NAV[b.dataset.t];b.innerHTML=ic(k)+`<span>${l}</span>`;b.setAttribute("aria-label",l);b.onclick=()=>{hap(H.tap);if(b.dataset.t===curTab&&$("#game").classList.contains("hide")&&$("#duel").classList.contains("hide")&&$("#online").classList.contains("hide")){scrollTo({top:0,behavior:"smooth"});return}tab(b.dataset.t)}});
 let curTab="home";
+/* Aucun zoom : pincement (iOS : événements gesture), deux doigts, double toucher, Ctrl + molette */
+["gesturestart","gesturechange","gestureend"].forEach(t=>addEventListener(t,e=>e.preventDefault(),{passive:false}));
+addEventListener("touchmove",e=>{if(e.touches.length>1||(e.scale&&e.scale!==1))e.preventDefault()},{passive:false});
+addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
+let lt=0;addEventListener("touchend",e=>{const n=Date.now();if(n-lt<350&&!e.target.closest("textarea,input"))e.preventDefault();lt=n},{passive:false});
 /* Comportement d'application : pas de menu « Copier » ni de sélection au toucher long, sauf dans les champs de saisie */
 addEventListener("contextmenu",e=>{if(!e.target.closest("textarea,input"))e.preventDefault()});
 addEventListener("selectstart",e=>{if(!e.target.closest||!e.target.closest("textarea,input"))e.preventDefault()});
