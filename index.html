@@ -362,7 +362,10 @@ textarea:focus{border-color:var(--ink)}
 .msg{margin-top:10px;font-weight:600;font-size:15px}
 
 /* Toast */
-#toast{position:fixed;left:auto;right:max(24px,calc(50% - 216px));bottom:calc(var(--safe-b) + 100px);width:fit-content;max-width:calc(100% - 48px);box-sizing:border-box;padding:12px 18px;border-radius:var(--pill);background:var(--action);color:var(--on-action);font:600 15px/18px var(--f-t);z-index:30;animation:pop .25s both;text-align:center}
+#toast{position:fixed;left:auto;right:max(24px,calc(50% - 216px));bottom:calc(var(--safe-b) + 100px);width:fit-content;max-width:calc(100% - 48px);box-sizing:border-box;padding:12px 18px;border-radius:var(--pill);background:var(--action);color:var(--on-action);font:600 15px/18px var(--f-t);z-index:30;animation:tIn .35s cubic-bezier(.2,.9,.3,1.2) both;text-align:center}
+#toast.out{animation:tOut .25s ease-in both}
+@keyframes tIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes tOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(10px) scale(.97)}}
 </style>
 </head>
 <body>
@@ -871,7 +874,8 @@ function replay(el,c){el.classList.remove(c);void el.offsetWidth;el.classList.ad
 function stagger(c){[...c.children].forEach((e,i)=>e.style.setProperty("--i",Math.min(i,12)));replay(c,"stg")}
 function countTo(el,from,to,ms=800,suf="",f0=fc){if(!el)return;const t0=performance.now();
   (function f(t){if(!el.isConnected)return;const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);el.textContent=f0(from+(to-from)*e)+suf;if(k<1)requestAnimationFrame(f)})(t0)}
-let tT;function toast(t){const e=$("#toast");e.textContent=t;e.classList.remove("hide");replay(e,"pop");clearTimeout(tT);tT=setTimeout(()=>e.classList.add("hide"),2200)}
+let tT,tH;function toast(t){const e=$("#toast");clearTimeout(tT);clearTimeout(tH);e.textContent=t;e.classList.remove("hide","out");replay(e,"in");
+  tT=setTimeout(()=>{e.classList.add("out");tH=setTimeout(()=>{e.classList.add("hide");e.classList.remove("out","in")},260)},2200)}
 
 /* ===== THÈME ===== */
 function applyTheme(){const r=document.documentElement;S.theme==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",S.theme);
@@ -1017,7 +1021,7 @@ function renderSet(){
   $("#sRules").onclick=()=>{hap(H.tap);rules()};
   $("#sImp").onclick=importSheet;
   $("#sAbout").onclick=()=>{hap(H.tap);sheet("À propos",`<section class="about" aria-label="Informations sur l'application"><dl class="about-l">
-    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.8</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
+    <div><dt>Nom</dt><dd>HowMuch?</dd></div><div><dt>Version du jeu</dt><dd>1.9</dd></div><div><dt>Version de l'artefact</dt><dd>1793520548-7f96</dd></div>
     <div><dt>Dernière modification</dt><dd>01/11/2026</dd></div><div><dt>Créé par</dt><dd>Lucas Courcy</dd></div></dl></section>`)};
   if($("#sInst"))$("#sInst").onclick=()=>{hap(H.ok);if(DP){DP.prompt();return}
     sheet("Installer HowMuch?",`<ol class="rules"><li><b class="c-electric">1</b><span><b>iPhone</b> : bouton Partager, puis « Sur l'écran d'accueil ».</span></li><li><b class="c-olive">2</b><span><b>Android</b> : menu ⋮ du navigateur, puis « Installer l'application ».</span></li></ol>`)};
